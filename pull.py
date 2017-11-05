@@ -8,7 +8,7 @@ def pull(path_to_repo = '.'):
         restart()
 
 def restart(command = 'server.py'):
-    process = subprocess.Popen(['pkill', 'server.py'])
+    process = subprocess.Popen(['pkill', command])
     process = subprocess.Popen(['bash', '/var/www/nbai_live/starterup'])
 
 if __name__ == '__main__':
