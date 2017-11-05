@@ -21,6 +21,7 @@
 
     <!-- Custom styles for this template -->
 	  <link rel="stylesheet" href="{{url_for('static', filename='css/grayscale.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/table.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/playerspage.css')}}">
 
   </head>
@@ -101,9 +102,69 @@
 
 
           </div>
+
+          <div class="row" id="table-section" style="padding-top: 50px;">
+          <div class="col-lg-10 mx-auto">
+            <div class="prediction-table-outer-container">
+              <div id="prediction-table-inner-container">
+                <div class="row">
+                  <div id ="table-filter" class="col-lg-3">
+
+                    <h2>Search Filter</h2>
+                    <p>Search on games based on opponent team and value.</p>
+
+                    <h3>Opponent Team:</h3>
+                    <select onchange = "PlayerFilterFunction({{playerpage_team_index}}, {{playerpage_value_index}})" name="team" id="team_dropdown" style="width:200px;">
+                      <option value="ALL" selected>ALL</option>
+                      {% for datum in opp_team_list %}
+                      <option value={{datum}}>{{datum}}</option>
+                      {% endfor %}
+                    </select>
+
+                    <h3>Value:</h3>
+                    <select onchange = "PlayerFilterFunction({{playerpage_team_index}}, {{playerpage_value_index}})" name="value" id="value_dropdown" style="width:200px;">
+                      <option value="ALL" selected>ALL</option>
+                      <option value="Undervalued">Undervalued</option>
+                      <option value="Overvalued">Overvalued</option>
+                    </select>
+                  </div>
+
+                  <div class="col-lg-9">
+                    <table id="table" class="container text-center">
+
+                      <tr id="top-row">
+                      {% for headers in player_table_headers %}
+                        <th onclick="sortPlayerTable({{loop.index0}})">{{headers}}</th>
+                      {% endfor %}
+                      </tr>
+
+                      {% for game_list in player_table%}
+                      <tr>
+                        {% for datum in game_list%}                        
+                        {% if datum == 'Overvalued'%}
+                        <td class="overvalued">{{datum}}</td>
+                        {% elif datum == 'Undervalued'%}
+                        <td class="undervalued">{{datum}}</td>
+                        {% else %}
+                        <td>{{datum}}</td>
+                        {% endif %}                      
+                        {% endfor %}
+                      </tr>
+                      {% endfor %}
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
           <div style="height: 500px; background-color: #71848e; margin: 0; padding: 0;">
           </div>
         </div>
+
+        
+
       </div>
     </div>
   </body>
@@ -125,5 +186,6 @@
 
   <!-- Custom scripts for this template -->
 <script src="{{url_for('static', filename='js/grayscale.js')}}"></script>
+<script src="{{url_for('static', filename='js/playerspage.js')}}"></script>
 
 </html>
