@@ -33,6 +33,7 @@ class Fields:
     game_id        = 'game_id'
     game_log_saved = 'game_log_saved'
     games_dict     = 'games_dict'
+    games_played   = 'games_played'
     has_bio        = 'has_bio'
     height         = 'height'
     is_home        = 'is_home'
@@ -50,6 +51,7 @@ class Fields:
     reb            = 'reb'
     roster         = 'roster'
     stl            = 'stl'
+    season         = 'season'
     team_abbr      = 'team_abbr'
     team_game_id   = 'team_game_id'
     team_id        = 'team_id'
@@ -98,6 +100,7 @@ class Structure:
     game_id        = basestring
     game_log_saved = bool
     games_dict     = { basestring : [basestring] }
+    games_played   = int
     has_bio        = bool
     height         = int
     is_home        = bool
@@ -115,6 +118,7 @@ class Structure:
     reb            = int
     roster         = [int]
     stl            = int
+    season         = int
     team_abbr      = basestring
     team_game_id   = basestring
     team_id        = int

@@ -3,18 +3,15 @@ from database.tables._base import DatabaseRecord
 from database.tables.fields import Fields as f
 from database.tables.fields import Structure as s
 
+TABLE_NAME = 'player_season_stats'
 
 
 @connection.register
-class GameLogRecord(DatabaseRecord):
+class PlayerSeasonStatsRecord(DatabaseRecord):
+
+    __collection__ = TABLE_NAME
 
     structure = {
-#        f.team_id      : s.team_id,
-#        f.game_id      : s.game_id,
-#        f.team_name    : s.team_name,
-#        f.team_abbr    : s.team_abbr,
-#        f.game_date    : s.game_date,
-#        f.is_home      : s.is_home,
         f.pts          : s.pts,
         f.reb          : s.reb,
         f.oreb         : s.oreb,
@@ -34,15 +31,19 @@ class GameLogRecord(DatabaseRecord):
         f.fta          : s.fta,
         f.won          : s.won,
         f.games_played : s.games_played,
+	f.season       : s.season,
+	f.player_id    : s.player_id, 
     }
 
+
+
+    indexes = [
+        {
+            'fields' : [f.player_id],
+            'unique' : False
+        }
+    ]
     required_fields = [
-#        f.team_id,
-#        f.game_id,
-#        f.team_name,
-#        f.team_abbr,
-#        f.game_date,
-#        f.is_home,
         f.pts,
         f.reb,
         f.oreb,
@@ -61,7 +62,9 @@ class GameLogRecord(DatabaseRecord):
         f.ftm,
         f.fta,
         f.won,
-        f.games_played,
+	f.games_played,
+	f.season,
+	f.player_id, 
     ]
 
     default_values = {
