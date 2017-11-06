@@ -12,6 +12,7 @@ class PlayerSeasonStatsRecord(DatabaseRecord):
     __collection__ = TABLE_NAME
 
     structure = {
+        #poop 
         f.pts          : s.pts,
         f.reb          : s.reb,
         f.oreb         : s.oreb,
