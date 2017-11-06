@@ -20,6 +20,15 @@ value_column_index    = 5;
 
 todays_players = load_todays_players()
 
+# player page variables
+player_table_headers = ['Opponent Team', 'Fantasy Score', 'Value']
+player_table = [['Team1', 'FantasyScore1', 'Overvalued' ],
+                ['Team2', 'FantasyScore2', 'Undervalued' ],
+                ['Team3', 'FantasyScore3', 'Value3' ]
+                ]
+opp_team_list = ['Team1', 'Team2', 'Team3']
+
+
 @app.route('/', defaults={'path': ''})
 @app.route('/index.html', defaults={'path': '/index.html'})
 def home_page(path):
@@ -44,7 +53,12 @@ def player_page(playerid):
     if(player):
         return flask.render_template(
             'players_page.html',
-            player = player
+            player = player,
+            player_table = player_table,
+            player_table_headers = player_table_headers,
+            opp_team_list = opp_team_list,
+            playerpage_team_index = 0,
+            playerpage_value_index = 2
         )
     else:
         return flask.abort(404)
