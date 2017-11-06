@@ -136,7 +136,7 @@ def load_todays_players():
                     roster.append(player_item[f.player_name])
                     value = ['Overvalued', 'Undervalued']
                     if(i < 2):
-                        output.append([player_item[f.player_name], team_abbr, player_item[f.position], opp, randint(10, 32), value[randint(0,1)]])
+                        output.append([[player_item[f.player_name], player_item[f.player_id]], team_abbr, player_item[f.position], opp, randint(10, 32), value[randint(0,1)]])
                 else:
                     continue
                 i += 1
