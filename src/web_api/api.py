@@ -47,7 +47,8 @@ def get_all_current_rosters():
 Returns a list of PlayerGameNodes for a given season
 """
 def get_player_game_nodes(year):
-    return [PlayerGameNode(datum) for datum in get_gamelog_json(year, 'P')]
+    nodes = [PlayerGameNode(datum) for datum in get_gamelog_json(year, 'P')]
+    return [node for node in nodes if node.won is not None]
 
 
 
@@ -55,7 +56,8 @@ def get_player_game_nodes(year):
 Returns a list of TeamGameNodes for a given season
 """
 def get_team_game_nodes(year):
-    return [TeamGameNode(datum) for datum in get_gamelog_json(year, 'T')]
+    nodes = [TeamGameNode(datum) for datum in get_gamelog_json(year, 'T')]
+    return [node for node in nodes if node.won is not None]
 
 
 

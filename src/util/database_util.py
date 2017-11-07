@@ -169,8 +169,7 @@ def _create_and_save_game_logs(game_logs, primary_key, table_name, team_game_ros
     ## Otherwise, create any object that's not already here
     batch = [_get_game_log_record(log, primary_key, team_game_rosters)
              for idee, log in game_log_dict.items()
-             if idee not in previously_saved_records
-             and log.won is not None]
+             if idee not in previously_saved_records]
 
     num_saved_records = 0
     if batch:
@@ -446,8 +445,7 @@ def create_and_save_all_player_season_stats_records(player_game_nodes, season):
     ## Create a dict of {player_id : [player_game_node]} pairs
     player_dict = {}
     for node in player_game_nodes:
-        if node.won is not None: ## If this game is finished (aka not playing right meow)
-            player_dict.setdefault(node.player_id, []).append(node)
+        player_dict.setdefault(node.player_id, []).append(node)
 
     ## Create a list of records representing these nodes
     records_we_might_save = [_get_player_season_stats_record(player_id, nodes, season)
