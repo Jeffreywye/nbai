@@ -172,12 +172,10 @@ def get_player_scores(players):
         print('Player: {}'.format(player_name))
         print('    Playing against: {}'.format(team_abbr))
 
-        #get predicted fantasy points
         opp_id   = connection.NBAI.teams.find_one({f.team_abbr : team_abbr}, {f.team_id : 1, '_id' : 0})['team_id']
 
-        # ftsy_prj = nba_team.TeamVsPlayer(opp_id, player_id, season='2017-18').vs_player_overall()
-        # ftsy_prj = ftsy_prj[0]['NBA_FANTASY_PTS'] if len(ftsy_prj) else 0
-        ftsy_prj = 0
+        ftsy_prj = nba_team.TeamVsPlayer(opp_id, player_id, season='2017-18').vs_player_overall()
+        ftsy_prj = ftsy_prj[0]['NBA_FANTASY_PTS'] if len(ftsy_prj) else 0
 
         print('    Project points:  {}'.format(ftsy_prj))
         player.append(int(ftsy_prj))
