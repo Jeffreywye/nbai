@@ -4,7 +4,7 @@ import nba_py
 from pymongo import MongoClient
 
 from util.basic import log_call_stack
-from web_api.api import get_all_current_rosters, get_all_short_player_bios, get_long_player_bio, get_2017_schedule_nodes
+from web_api.api import get_all_rosters, get_all_short_player_bios, get_long_player_bio, get_2017_schedule_nodes
 from database.connection import DATABASE_NAME, connection
 from database.tables.fields import Fields as f
 from database.tables.league.players import PlayerRecord
@@ -224,10 +224,10 @@ Updates the current roster of every team.
 Also updates the player's team data, if they were dropped or added.
 """
 @log_call_stack
-def update_rosters():
+def update_rosters(year):
 
     ## Get all rosters
-    rosters = get_all_current_rosters()
+    rosters = get_all_rosters(year)
 
 
     ## For each team in the league
@@ -252,7 +252,7 @@ def update_rosters():
             player_rec = connection.PlayerRecord.one(query)
             if player_rec.team_id == team_id:
                 player_rec.team_id = None
-                player.save()
+                player_rec.save()
 
         ## Update the current team for all added players
         for player_id in added:
