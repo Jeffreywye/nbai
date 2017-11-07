@@ -46,6 +46,14 @@ a {
     text-decoration: none;
     color: #1d9b6c; }
 
+a.player-link {
+    color: #757e81;
+}
+
+a.player-link:hover {
+    color:#1d9b6c;;
+}
+
 #mainNav {
   font-family: 'Cabin', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   margin-bottom: 0;

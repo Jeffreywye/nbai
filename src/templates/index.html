@@ -160,7 +160,9 @@
                       {% for player_list in website_table%}
                       <tr>
                         {% for datum in player_list%}
-                        {% if datum == 'Overvalued'%}
+                        {% if datum is iterable and datum is not string %}
+                        <td><a class ="player-link" href="players/{{datum[1]}}">{{datum[0]}}</a></td>
+                        {% elif datum == 'Overvalued'%}
                         <td class="overvalued">{{datum}}</td>
                         {% elif datum == 'Undervalued'%}
                         <td class="undervalued">{{datum}}</td>
