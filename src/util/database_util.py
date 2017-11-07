@@ -190,7 +190,6 @@ Creates a PlayerSeasonStatsRecord from a list of PlayerGameNodes
 
 def _get_player_season_stats_records(player_id, pg_nodes, season):
 
-
     ## Create a PlayerSeasonStatsRecord object
     rec = connection.PlayerSeasonStatsRecord()
 
@@ -200,7 +199,8 @@ def _get_player_season_stats_records(player_id, pg_nodes, season):
                   f.fga, f.fg3m, f.fg3a, f.ftm, f.fta, f.won]
 
     ## Set all the non-statistical fields
-    rec.player_id = node.player_id
+    rec.player_id = rec.player_id
+    # changed node to rec
     rec.season = season
     rec.games_played = len(pg_nodes)
 
@@ -217,7 +217,7 @@ def _get_player_season_stats_records(player_id, pg_nodes, season):
                     setattr(rec, field, 0)
 
                 ## And increment the field
-                setattr(player_rec, field, getattr(player_rec, field) + getattr(node, field))
+                setattr(rec, field, getattr(rec, field) + getattr(node, field))
 
     ## Return the record
     return rec
@@ -227,6 +227,8 @@ def _get_player_season_stats_records(player_id, pg_nodes, season):
 """
 Creates and saves all nonexistient PlayerSeasonStatsRecords, if not present in the database
 """
+
+
 def create_and_save_all_player_season_stats_records(player_game_nodes, season):
 
     ## Create a dict of {player_id : [player_game_node]} pairs
@@ -235,7 +237,7 @@ def create_and_save_all_player_season_stats_records(player_game_nodes, season):
         player_dict.setdefault(node.player_id, []).append(node)
 
     ## Create a list of records representing these nodes
-    records_we_might_save = [_get_player_season_stats_record(player_id, nodes, season)
+    records_we_might_save = [_get_player_season_stats_records(player_id, nodes, season)
                              for player_id, nodes in player_dict.items()]
 
     ## Get the table we're saving to
