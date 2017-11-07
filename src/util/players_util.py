@@ -5,7 +5,9 @@ import unicodedata
 from datetime import date
 from database.connection import DATABASE_NAME, connection
 from database.tables.fields import Fields as f
+from nba_py import team as nba_team
 from random import randint
+import pprint as pp
 
 
 """
@@ -136,7 +138,7 @@ def load_todays_players():
                     roster.append(player_item[f.player_name])
                     value = ['Overvalued', 'Undervalued']
                     if(i < 2):
-                        output.append([[player_item[f.player_name], player_item[f.player_id]], team_abbr, player_item[f.position], opp, randint(10, 32), value[randint(0,1)]])
+                        output.append([[player_item[f.player_name], player_item[f.player_id]], team_abbr, player_item[f.position], opp])
                 else:
                     continue
                 i += 1
@@ -159,3 +161,24 @@ def get_todays_games():
         team_abbr = connection.NBAI.teams.find_one({f.team_id : int(game[f.team_id])}, {f.team_abbr : 1, '_id' : 0})[f.team_abbr]
         games.append(team_abbr)
     return games
+
+"""
+"""
+
+def get_player_scores(players):
+
+    for player in players:
+        player_name, player_id, team_abbr, opp = player[0][0], player[0][1], player[1], player[3]
+        print('Player: {}'.format(player_name))
+        print('    Playing against: {}'.format(team_abbr))
+
+        #get predicted fantasy points
+        opp_id   = connection.NBAI.teams.find_one({f.team_abbr : team_abbr}, {f.team_id : 1, '_id' : 0})['team_id']
+
+        # ftsy_prj = nba_team.TeamVsPlayer(opp_id, player_id, season='2017-18').vs_player_overall()
+        # ftsy_prj = ftsy_prj[0]['NBA_FANTASY_PTS'] if len(ftsy_prj) else 0
+        ftsy_prj = 0
+
+        print('    Project points:  {}'.format(ftsy_prj))
+        player.append(int(ftsy_prj))
+    return players

@@ -10,6 +10,7 @@ from web_api.api import get_player_game_nodes, get_team_game_nodes
 
 now = datetime.datetime.utcnow()
 CURRENT_SEASON_YEAR = now.year if now.month > 8 else now.year - 1
+print(CURRENT_SEASON_YEAR)
 
 
 """
@@ -56,7 +57,7 @@ def backfill_server(start_year, end_year, add_missing_player_bios, update_all_pl
         database_util.update_long_player_bios(update_all_player_bios)
 
     ## Update rosters
-    if start_year <= CURRENT_SEASON_YEAR <= end_year:
+    if (start_year <= CURRENT_SEASON_YEAR <= end_year or end_year - start_year == 0):
         database_util.update_rosters()
 
     ## And add the most recent schedules

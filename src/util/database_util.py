@@ -237,6 +237,7 @@ def update_rosters():
         team_id = team_rec.team_id
         old_roster = team_rec.roster
         new_roster = rosters[team_id].roster
+        print(new_roster)
 
         ## Set the teams new roster
         team_rec.roster = new_roster

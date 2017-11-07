@@ -120,10 +120,10 @@
                     <p>Search on players based on name, team, position.</p>
 
                     <h3>Name:</h3>
-                    <input type="text" id="search" style="width:200px;" placeholder="Player Name" onkeyup="newFilterFunction({{name_index}}, {{team_index}}, {{position_index}}, {{value_index}})">
+                    <input type="text" id="search" style="width:200px;" placeholder="Player Name" onkeyup="newFilterFunction({{name_index}}, {{team_index}}, {{position_index}})">
 
                     <h3>Position:</h3>
-                    <select onchange = "newFilterFunction({{name_index}}, {{team_index}}, {{position_index}}, {{value_index}})" name="position" id="position_dropdown" style="width:200px;">
+                    <select onchange = "newFilterFunction({{name_index}}, {{team_index}}, {{position_index}})" name="position" id="position_dropdown" style="width:200px;">
                       <option value="ALL" selected>ALL</option>
                       <option value="G">G</option>
                       <option value="F">F</option>
@@ -133,18 +133,11 @@
                     </select>
 
                     <h3>Team:</h3>
-                    <select onchange = "newFilterFunction({{name_index}}, {{team_index}}, {{position_index}}, {{value_index}})" name="team" id="team_dropdown" style="width:200px;">
+                    <select onchange = "newFilterFunction({{name_index}}, {{team_index}}, {{position_index}})" name="team" id="team_dropdown" style="width:200px;">
                       <option value="ALL" selected>ALL</option>
                       {% for datum in team_list %}
                       <option value={{datum}}>{{datum}}</option>
                       {% endfor %}
-                    </select>
-
-                    <h3>Value:</h3>
-                    <select onchange = "newFilterFunction({{name_index}}, {{team_index}}, {{position_index}}, {{value_index}})" name="value" id="value_dropdown" style="width:200px;">
-                      <option value="ALL" selected>ALL</option>
-                      <option value="Undervalued">Undervalued</option>
-                      <option value="Overvalued">Overvalued</option>
                     </select>
                   </div>
 
@@ -162,10 +155,6 @@
                         {% for datum in player_list%}
                         {% if datum is iterable and datum is not string %}
                         <td><a class ="player-link" href="players/{{datum[1]}}">{{datum[0]}}</a></td>
-                        {% elif datum == 'Overvalued'%}
-                        <td class="overvalued">{{datum}}</td>
-                        {% elif datum == 'Undervalued'%}
-                        <td class="undervalued">{{datum}}</td>
                         {% else %}
                         <td>{{datum}}</td>
                         {% endif %}
