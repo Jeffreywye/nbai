@@ -12,6 +12,7 @@ from database.tables.league.player_game_logs import PlayerGameLogRecord
 from database.tables.league.teams import TeamRecord
 from database.tables.league.team_game_logs import TeamGameLogRecord
 from database.tables.league.schedules import ScheduleRecord
+from database.tables.league.player_season_stats_record import PlayerSeasonStatsRecord
 
 
 
@@ -179,6 +180,95 @@ def _create_and_save_game_logs(game_logs, primary_key, table_name, team_game_ros
 
     logging.info("CREATED/SAVED this many {}s:      {}".format(primary_key, num_saved_records))
     return
+
+
+
+"""
+Creates a PlayerSeasonStatsRecord from a list of PlayerGameNodes
+"""
+
+
+def _get_player_season_stats_records(player_id, pg_nodes, season):
+
+
+    ## Create a PlayerSeasonStatsRecord object
+    rec = connection.PlayerSeasonStatsRecord()
+
+    ## Get a list of all the statistical attributes
+    stat_attrs = [f.pts, f.reb, f.oreb, f.dreb, f.ast, f.blk, f.stl,
+                  f.plus_minus, f.fouls, f.tov, f.minutes, f.fgm,
+                  f.fga, f.fg3m, f.fg3a, f.ftm, f.fta, f.won]
+
+    ## Set all the non-statistical fields
+    rec.player_id = node.player_id
+    rec.season = season
+    rec.games_played = len(pg_nodes)
+
+    ## Set all the statistical attributes
+    for node in pg_nodes:
+        for field in stat_attrs:
+
+            ## Some fields (ex: fg_pct) can be None if no attempts were made.
+            ## This check lets us avoid int + None
+            if getattr(node, field) is not None:
+
+                ## Set the default value (if necessary)
+                if getattr(rec, field) is None:
+                    setattr(rec, field, 0)
+
+                ## And increment the field
+                setattr(player_rec, field, getattr(player_rec, field) + getattr(node, field))
+
+    ## Return the record
+    return rec
+
+
+
+"""
+Creates and saves all nonexistient PlayerSeasonStatsRecords, if not present in the database
+"""
+def create_and_save_all_player_season_stats_records(player_game_nodes, season):
+
+    ## Create a dict of {player_id : [player_game_node]} pairs
+    player_dict = {}
+    for node in player_game_nodes:
+        player_dict.setdefault(node.player_id, []).append(node)
+
+    ## Create a list of records representing these nodes
+    records_we_might_save = [_get_player_season_stats_record(player_id, nodes, season)
+                             for player_id, nodes in player_dict.items()]
+
+    ## Get the table we're saving to
+    table_name = PlayerSeasonStatsRecord.__collection__
+    player_season_stats_table = getattr(getattr(MongoClient(), DATABASE_NAME), table_name)
+
+    ## Query the database for records already in there
+    player_id_query = { f.player_id : { '$in' : player_dict.keys() } }
+    season_query = { f.season, season }
+    query = { '$and' : [ player_id_query, season_query ] }
+    previously_saved_records = { rec[f.player_id] : rec for rec in
+                                 player_season_stats_table.find(query) }
+
+    ## Get a list of the records to save
+    insert_batch = [rec for rec in records_we_might_save
+             if rec.player_id not in previously_saved_records]
+    update_batch = [rec for rec in records_we_might_save
+             if rec.player_id in previously_saved_records
+             and rec.games_played > previously_saved_records[rec.player_id].games_played]
+    for rec in update_batch:
+        rec._id = previously_saved_records['_id']
+
+    ## Save these records
+    if insert_batch:
+        saved_records = player_season_stats_table.insert(insert_batch)
+        print "INSERTED this many {} PlayerSeasonStatRecords: {}".format(season, len(saved_records))
+
+    if update_batch:
+        saved_records = player_season_stats_table.update(update_batch)
+        print "UPDATED  this many {} PlayerSeasonStatRecords: {}".format(season, len(saved_records))
+
+    return
+
 
 
 
