@@ -60,7 +60,7 @@ def backfill_server(start_year, end_year, add_missing_player_bios, update_all_pl
 
     ## Update rosters
     if start_year <= CURRENT_SEASON_YEAR <= end_year:
-        database_util.update_rosters()
+        database_util.update_rosters(CURRENT_SEASON_YEAR)
 
     ## And add the most recent schedules
     database_util.create_and_save_2017_schedule_records()

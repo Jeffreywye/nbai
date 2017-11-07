@@ -36,9 +36,10 @@ def get_long_player_bio(player_id):
 """
 Returns a dict of <team_id, RosterNode> pairs for every team as of today
 """
-def get_all_current_rosters():
+def get_all_rosters(year):
+    season = '{}-{}'.format(year, str(year+1)[2:])
     team_ids = [int(team['id']) for team in TEAMS.values()]
-    nba_data = lambda team_id : nba_py_team.TeamCommonRoster(team_id).roster()
+    nba_data = lambda team_id : nba_py_team.TeamCommonRoster(team_id, season=season).roster()
     return { tid : RosterNode(nba_data(tid), tid) for tid in team_ids }
 
 
