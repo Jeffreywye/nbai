@@ -246,10 +246,11 @@ def create_and_save_all_player_season_stats_records(player_game_nodes, season):
 
     ## Query the database for records already in there
     player_id_query = { f.player_id : { '$in' : player_dict.keys() } }
-    season_query = { f.season, season }
+    season_query = { f.season : season }
     query = { '$and' : [ player_id_query, season_query ] }
+    l = player_season_stats_table.find(query)
     previously_saved_records = { rec[f.player_id] : rec for rec in
-                                 player_season_stats_table.find(query) }
+                                player_season_stats_table.find(query) }
 
     ## Get a list of the records to save
     insert_batch = [rec for rec in records_we_might_save
@@ -376,6 +377,9 @@ def update_short_player_bios():
     bio_dict = { node.player_id : node for node in get_all_short_player_bios() }
 
     ## Now, for every player in the db, update their short bio
+    print(len(bio_dict))
+    print(connection.PlayerRecord.find().count())
+    exit()
     for player_rec in connection.PlayerRecord.find():
 
         ## Get this player's bio

@@ -41,7 +41,7 @@ def backfill_server(start_year, end_year, add_missing_player_bios, update_all_pl
         database_util.create_and_save_all_player_records(player_game_nodes, year, player_dict)
 
         ## create and add all player season records to db
-        database_util.create_and_save_all_player_season_stats_records(player_game_nodes, year)
+#        database_util.create_and_save_all_player_season_stats_records(player_game_nodes, year)
 
         ## Add all the PlayerGameLogs from this season to the database
         database_util.create_and_save_all_player_game_log_records(player_game_nodes)
