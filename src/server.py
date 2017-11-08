@@ -19,15 +19,11 @@ team_column_index     = 1;
 
 
 todays_players = load_todays_players()
-todays_players = get_player_scores(todays_players)
-print(todays_players)
+todays_players, top_3_value = get_player_scores(todays_players)
 
 @app.route('/', defaults={'path': ''})
 @app.route('/index.html', defaults={'path': '/index.html'})
 def home_page(path):
-
-
-
     return flask.render_template(
         'index.html',
         header_list    = some_list,
@@ -35,7 +31,8 @@ def home_page(path):
         position_index = position_column_index,
         team_index     = team_column_index,
         name_index     = name_column_index,
-        team_list      = teamlist
+        team_list      = teamlist,
+        top_3_value    = top_3_value
     )
 
 
@@ -65,4 +62,4 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    app.run(host=args.host, port=args.port, debug=True)
+    app.run(host=args.host, port=args.port)

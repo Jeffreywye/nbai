@@ -1,5 +1,6 @@
 import string
 import math
+import operator
 import unicodedata
 
 from datetime import date
@@ -7,8 +8,6 @@ from database.connection import DATABASE_NAME, connection
 from database.tables.fields import Fields as f
 from nba_py import team as nba_team
 from nba_py import player as nba_player
-from random import randint
-import pprint as pp
 
 
 """
@@ -169,18 +168,28 @@ Gets projected player fantasy scores and updates the front page player list
 Returns an updated list of players, position, score, opponent.
 """
 def get_player_scores(players):
+    player_values = {}
     for player in players:
         player_name, player_id, team_abbr, opp = player[0][0], player[0][1], player[1], player[3]
 
         opp_id   = connection.NBAI.teams.find_one({f.team_abbr : team_abbr}, {f.team_id : 1, '_id' : 0})['team_id']
         print('Getting opponent team ID...')
 
-        ftsy_prj = calculate_fantasy_points(player_id, opp_id)
+        ftsy_prj, value = calculate_fantasy_points(player_id, opp_id)
+        value = min(value, 1.5)
         print('Player: {}'.format(player_name))
         print('    Playing against: {}'.format(team_abbr))
         print('    Project points:  {}'.format(ftsy_prj))
         player.append(int(ftsy_prj))
-    return players
+        if ftsy_prj > 25 and value > 1.0:
+            ten_game_avg = ftsy_prj/value
+            player_values[value] = [int(ftsy_prj), int(ten_game_avg), int(ftsy_prj)-int(ten_game_avg), player_id, player_name]
+    sorted_player_values = sorted(player_values.items(), key=operator.itemgetter(0), reverse=True)
+    print(sorted_player_values)
+    player_values = [x[1] for x in sorted_player_values[:3]]
+    print(player_values)
+
+    return (players, player_values)
 
 """
 Retrieves and makes some adjustments to our player projections based on recent
@@ -192,8 +201,9 @@ def calculate_fantasy_points(player_id, opp_team_id):
     ftsy_prj = nba_team.TeamVsPlayer(opp_team_id, player_id, season='2017-18').vs_player_overall()
     ftsy_prj = ftsy_prj[0]['NBA_FANTASY_PTS'] if len(ftsy_prj) else 0
     ftsy_pts_last_5 = nba_player.PlayerLastNGamesSplits(player_id).last5()[0]['NBA_FANTASY_PTS']
-    ftsy_pts_last_20 = nba_player.PlayerLastNGamesSplits(player_id).last20()[0]['NBA_FANTASY_PTS']
-    recent_form = (ftsy_pts_last_5/ftsy_pts_last_20)
+    ftsy_pts_last_10 = nba_player.PlayerLastNGamesSplits(player_id).last20()[0]['NBA_FANTASY_PTS']
+    recent_form = (ftsy_pts_last_5/ftsy_pts_last_10)
     recent_form = min(max(.85, recent_form), 1.15)
     ftsy_prj = ftsy_prj * recent_form
-    return ftsy_prj
+    value = ftsy_prj/ftsy_pts_last_10
+    return (ftsy_prj, value)
