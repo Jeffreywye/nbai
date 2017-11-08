@@ -10,7 +10,6 @@ from web_api.api import get_player_game_nodes, get_team_game_nodes
 
 now = datetime.datetime.utcnow()
 CURRENT_SEASON_YEAR = now.year if now.month > 8 else now.year - 1
-print(CURRENT_SEASON_YEAR)
 
 
 """
