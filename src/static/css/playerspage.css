@@ -73,3 +73,79 @@ tr {
 .player-info {
   padding-top: 10px;
 }
+
+
+
+
+.prediction-table-outer-container {
+  background-color: white;
+  padding: 25px;
+}
+
+.prediction-table-outer-container td{
+  color: #757e81;
+}
+
+.player_filter {
+  color: #36404a;
+}
+
+
+#table {
+  background-color: white;
+}
+
+#table tr:nth-child(1) {
+  background-color: #f4f8fb;
+}
+
+#table-filter {
+  background-color: #f4f8fb;
+  padding: 5px;
+}
+
+#table-filter h2 {
+  font-size: 26px;
+  margin: 0;
+}
+
+#table-filter h3 {
+  font-size: 20px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+#table-filter p {
+  font-size: 14px;
+  color: #36404a;
+  margin: 0;
+  line-height: 14px;
+}
+#table-filter select {
+    margin-bottom: 5px;
+    background-color: #fff;
+    height: 25px;
+}
+
+#top-row {
+  border: none;
+}
+
+#top-row th {
+  font-weight: bolder;
+  font-size: 16px;
+  padding-top: 0;
+  line-height: 20px;
+  color: #36404a;
+  cursor: pointer;
+}
+
+td.overvalued {
+  font-weight: bold;
+  color: #bf5b70;
+}
+
+td.undervalued {
+  font-weight: bold;
+  color: #5bbfaa;
+}

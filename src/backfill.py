@@ -48,6 +48,9 @@ def backfill_server(start_year, end_year, add_missing_player_bios, update_all_pl
         team_game_rosters = database_util.get_team_game_rosters(player_game_nodes)
         database_util.create_and_save_all_team_game_log_records(team_game_nodes, team_game_rosters)
 
+        ## Add all the PlayerSeasonStats from this season to the database
+        database_util.create_and_save_all_player_season_stats_records(player_game_nodes, year)
+
         ## Add all the Schedues from this season to the database
         database_util.create_and_save_all_schedule_records(team_game_nodes)
 
@@ -57,8 +60,8 @@ def backfill_server(start_year, end_year, add_missing_player_bios, update_all_pl
         database_util.update_long_player_bios(update_all_player_bios)
 
     ## Update rosters
-    if (start_year <= CURRENT_SEASON_YEAR <= end_year or end_year - start_year == 0):
-        database_util.update_rosters()
+    if start_year <= CURRENT_SEASON_YEAR <= end_year:
+        database_util.update_rosters(CURRENT_SEASON_YEAR)
 
     ## And add the most recent schedules
     database_util.create_and_save_2017_schedule_records()
