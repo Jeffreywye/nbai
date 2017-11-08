@@ -477,7 +477,7 @@ def create_and_save_all_player_season_stats_records(player_game_nodes, season):
         saved_records = player_season_stats_table.insert(insert_batch)
         count = len(saved_records)
     logging.info("INSERTED this many {} PlayerSeasonStatRecords: {}".format(season, count))
-    
+
     count = 0
     if update_batch:
         saved_records = player_season_stats_table.update(update_batch)
@@ -485,4 +485,3 @@ def create_and_save_all_player_season_stats_records(player_game_nodes, season):
     logging.info("UPDATED  this many {} PlayerSeasonStatRecords: {}".format(season, count))
 
     return
-

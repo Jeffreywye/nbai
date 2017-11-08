@@ -1,40 +1,5 @@
-// var searchContent = document.getElementById("search");
-// searchContent.addEventListener("input",test);
-
-// function test(){
-// 	alert("hi");
-// }
-
-
-// var $rows = $('#table tr');
-// var $input = $('#search');
-// $input.keyup(filter);
-
-// function filter() {
-//     var val = $.trim($input.val()).replace(/ +/g, ' ').toLowerCase();
-//     $rows.show().filter().hide(hideFnc);
-// }
-
-// function hideFnc() {
-//         var text = $input.text().replace(/\s+/g, ' ').toLowerCase();
-//         return !~text.indexOf(val);
-// }
-
-// var $rows = $('#table tr');
-// $('#search').keyup(function() {
-//     var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
-//
-//     $rows.show().filter(function() {
-//         var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
-//         if (text.indexOf('first') === 1){
-//         	return 0;
-//         }
-//         return !~text.indexOf(val);
-//     }).hide();
-//
-// });
-
 function sortTable(n){
+	var POINTS_COLUMN_NUMBER = 4;
 	var table = document.getElementById("table");
 	var switching = true;
 	var switch_count = 0;
@@ -49,16 +14,34 @@ function sortTable(n){
 			var current_row = rows[current_row_index].getElementsByTagName('td')[n];
 			var next_row = rows[current_row_index + 1].getElementsByTagName('td')[n];
 
-			if (dir == "asc"){
-				if (current_row.innerHTML.toLowerCase() > next_row.innerHTML.toLowerCase()){
-					shouldSwitch = true;
-					break;
+			if (n == POINTS_COLUMN_NUMBER){
+				if (dir == "asc"){
+					if (Number(current_row.innerHTML) > Number(next_row.innerHTML)){
+						shouldSwitch = true;
+						break;
+					}
+				}
+				else if (dir == "desc"){
+					if (Number(current_row.innerHTML) < Number(next_row.innerHTML)){
+						shouldSwitch = true;
+						break;
+					}
 				}
 			}
-			else if (dir == "desc"){
-				if (current_row.innerHTML.toLowerCase() < next_row.innerHTML.toLowerCase()){
-					shouldSwitch = true;
-					break;
+
+
+			else{
+				if (dir == "asc"){
+					if (current_row.innerHTML.toLowerCase() > next_row.innerHTML.toLowerCase()){
+						shouldSwitch = true;
+						break;
+					}
+				}
+				else if (dir == "desc"){
+					if (current_row.innerHTML.toLowerCase() < next_row.innerHTML.toLowerCase()){
+						shouldSwitch = true;
+						break;
+					}
 				}
 			}
 		}
@@ -77,11 +60,10 @@ function sortTable(n){
 	}
 }
 
-function newFilterFunction(name_index, team_index, position_index, value_index ){
+function newFilterFunction(name_index, team_index, position_index){
 	var search_filter = document.getElementById("search").value.toUpperCase().trim();
 	var team_filter = document.getElementById("team_dropdown").value.toUpperCase();
 	var position_filter = document.getElementById("position_dropdown").value.toUpperCase();
-	var value_filter = document.getElementById("value_dropdown").value.toUpperCase();
 	var table = document.getElementById("table");
   	var rows = table.getElementsByTagName("tr");
 
@@ -94,7 +76,6 @@ function newFilterFunction(name_index, team_index, position_index, value_index )
   		var cur_row_name = rows[i].getElementsByTagName("td")[name_index];
   		var cur_row_team = rows[i].getElementsByTagName("td")[team_index];
   		var cur_row_pos  = rows[i].getElementsByTagName("td")[position_index];
-  		var cur_row_val  = rows[i].getElementsByTagName("td")[value_index];
 
   		//name filter
   		if (cur_row_name){
@@ -116,18 +97,14 @@ function newFilterFunction(name_index, team_index, position_index, value_index )
   			}
   			else if ((cur_row_pos.innerHTML.toUpperCase() == "C-F") && (position_filter == "F-C")){
   				var pos_bool = true;
-  			} 
+  			}
   		}
 		var pos_all = (position_filter == "ALL");
 
-  		//value filter
-  		if (cur_row_val){
-  			var val_bool = (cur_row_val.innerHTML.toUpperCase().indexOf(value_filter) > -1);
-  		}
-  		var val_all = (value_filter == "ALL");
 
 
-  		if ((name_bool||name_all)&&(team_bool||team_all)&&(pos_bool||pos_all)&&(val_bool||val_all)) {
+
+  		if ((name_bool||name_all)&&(team_bool||team_all)&&(pos_bool||pos_all)) {
   			rows[i].style.display = "";
         // setColors(display_color, rows[i]);
 
@@ -150,4 +127,3 @@ function newFilterFunction(name_index, team_index, position_index, value_index )
 //     display_color = 0;
 //   }
 // }
-

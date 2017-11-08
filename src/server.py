@@ -5,20 +5,21 @@ import pymongo
 
 from database.connection import DATABASE_NAME, connection
 from datetime import date
-from util.players_util import extract_player_info, load_todays_players, get_todays_games
+from util.players_util import *
 
 
 app = flask.Flask(__name__)
 
-some_list = ['Name', 'Team', 'Position', 'Opponent', 'Our Predictions', 'Value']
+some_list = ['Name', 'Team', 'Position', 'Opponent', 'Our Predictions']
 teamlist = get_todays_games()
 
 name_column_index     = 0;
 position_column_index = 2;
 team_column_index     = 1;
-value_column_index    = 5;
+
 
 todays_players = load_todays_players()
+todays_players, top_3_value = get_player_scores(todays_players)
 
 # player page variables
 player_table_headers = ['Opponent Team', 'Fantasy Score', 'Value']
@@ -32,9 +33,6 @@ opp_team_list = ['Team1', 'Team2', 'Team3']
 @app.route('/', defaults={'path': ''})
 @app.route('/index.html', defaults={'path': '/index.html'})
 def home_page(path):
-
-
-
     return flask.render_template(
         'index.html',
         header_list    = some_list,
@@ -42,8 +40,8 @@ def home_page(path):
         position_index = position_column_index,
         team_index     = team_column_index,
         name_index     = name_column_index,
-        value_index    = value_column_index,
-        team_list      = teamlist
+        team_list      = teamlist,
+        top_3_value    = top_3_value
     )
 
 
