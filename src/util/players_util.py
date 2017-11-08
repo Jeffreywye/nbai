@@ -164,15 +164,16 @@ def get_todays_games():
     return games
 
 """
-"""
+Gets projected player fantasy scores and updates the front page player list
 
+Returns an updated list of players, position, score, opponent.
+"""
 def get_player_scores(players):
     for player in players:
         player_name, player_id, team_abbr, opp = player[0][0], player[0][1], player[1], player[3]
 
         opp_id   = connection.NBAI.teams.find_one({f.team_abbr : team_abbr}, {f.team_id : 1, '_id' : 0})['team_id']
         print('Getting opponent team ID...')
-
 
         ftsy_prj = calculate_fantasy_points(player_id, opp_id)
         print('Player: {}'.format(player_name))
@@ -182,6 +183,10 @@ def get_player_scores(players):
     return players
 
 """
+Retrieves and makes some adjustments to our player projections based on recent
+performance of a player.
+
+Returns the projected fantasy points of a player.
 """
 def calculate_fantasy_points(player_id, opp_team_id):
     ftsy_prj = nba_team.TeamVsPlayer(opp_team_id, player_id, season='2017-18').vs_player_overall()
