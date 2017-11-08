@@ -6,6 +6,7 @@ from datetime import date
 from database.connection import DATABASE_NAME, connection
 from database.tables.fields import Fields as f
 from nba_py import team as nba_team
+from nba_py import player as nba_player
 from random import randint
 import pprint as pp
 
@@ -166,17 +167,28 @@ def get_todays_games():
 """
 
 def get_player_scores(players):
-
     for player in players:
         player_name, player_id, team_abbr, opp = player[0][0], player[0][1], player[1], player[3]
-        print('Player: {}'.format(player_name))
-        print('    Playing against: {}'.format(team_abbr))
 
         opp_id   = connection.NBAI.teams.find_one({f.team_abbr : team_abbr}, {f.team_id : 1, '_id' : 0})['team_id']
+        print('Getting opponent team ID...')
 
-        ftsy_prj = nba_team.TeamVsPlayer(opp_id, player_id, season='2017-18').vs_player_overall()
-        ftsy_prj = ftsy_prj[0]['NBA_FANTASY_PTS'] if len(ftsy_prj) else 0
 
+        ftsy_prj = calculate_fantasy_points(player_id, opp_id)
+        print('Player: {}'.format(player_name))
+        print('    Playing against: {}'.format(team_abbr))
         print('    Project points:  {}'.format(ftsy_prj))
         player.append(int(ftsy_prj))
     return players
+
+"""
+"""
+def calculate_fantasy_points(player_id, opp_team_id):
+    ftsy_prj = nba_team.TeamVsPlayer(opp_team_id, player_id, season='2017-18').vs_player_overall()
+    ftsy_prj = ftsy_prj[0]['NBA_FANTASY_PTS'] if len(ftsy_prj) else 0
+    ftsy_pts_last_5 = nba_player.PlayerLastNGamesSplits(player_id).last5()[0]['NBA_FANTASY_PTS']
+    ftsy_pts_last_20 = nba_player.PlayerLastNGamesSplits(player_id).last20()[0]['NBA_FANTASY_PTS']
+    recent_form = (ftsy_pts_last_5/ftsy_pts_last_20)
+    recent_form = min(max(.85, recent_form), 1.15)
+    ftsy_prj = ftsy_prj * recent_form
+    return ftsy_prj
