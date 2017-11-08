@@ -4,7 +4,7 @@ import operator
 import unicodedata
 import pymongo
 
-from datetime import date
+from datetime import date, datetime
 from database.connection import DATABASE_NAME, connection
 from database.tables.fields import Fields as f
 from nba_py import team as nba_team
@@ -108,10 +108,7 @@ previous game.
 Returns a list of players, position, value, opponent.
 """
 def load_todays_players():
-    today = date.today()
-    today_day  = str(today.day) if today.day > 9 else '0' + str(today.day)
-    today_month = str(today.month) if today.month > 9 else '0' + str(today.month)
-    todays_date = str(today.year) + today_month + today_day
+    todays_date = datetime.strftime(datetime.now(), '%Y%m%d')
     games = {}
     output = []
 
@@ -165,10 +162,7 @@ Loads todays teams playing in games from the database.
 Returns a list team abbreviations.
 """
 def get_todays_games():
-    today = date.today()
-    today_day  = str(today.day) if today.day > 9 else '0' + str(today.day)
-    today_month = str(today.month) if today.month > 9 else '0' + str(today.month)
-    todays_date = str(today.year) + today_month + today_day
+    todays_date = datetime.strftime(datetime.now(), '%Y%m%d')
     games = []
 
     todays_games = connection.NBAI.schedules.find({f.game_date : todays_date})
