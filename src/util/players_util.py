@@ -227,3 +227,20 @@ def calculate_fantasy_points(player_id, opp_team_id):
     ftsy_prj = ftsy_prj * recent_form
     value = ftsy_prj/ftsy_pts_last_10 if ftsy_pts_last_10 > 0 else 1
     return (ftsy_prj, value)
+
+"""
+Given a player_id this will return a dictionary of this players stats for the season.
+Example: get_player_stats_dict(2544) will return a dict of dict of stat value pairs.
+{2017: "player_id" : 2544, "pts" : 9000 ... , 2016 : "player_id" : 2544 , "pts" : 5 }
+"""
+def get_player_season_stats_dict(player_id):
+    player_season_stats_dict = defaultdict(list)
+    query = {"player_id" : player_id}
+    player_record_cursor = connection.PlayerSeasonStatsRecord.find(query)
+    
+    for each in player_record_cursor:
+        single_player_season_stat_record_dict_format = dict(each.items())
+        season = single_player_season_stat_record_dict_format["season"]
+        player_season_stats_dict[season] = single_player_season_stat_record_dict_format
+    
+    return player_season_stats_dict
