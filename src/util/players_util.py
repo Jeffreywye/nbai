@@ -6,6 +6,8 @@ from datetime import date
 from database.connection import DATABASE_NAME, connection
 from database.tables.fields import Fields as f
 from random import randint
+from collections import defaultdict
+from database.tables.league import player_season_log_record
 
 
 """
@@ -136,7 +138,7 @@ def load_todays_players():
                     roster.append(player_item[f.player_name])
                     value = ['Overvalued', 'Undervalued']
                     if(i < 2):
-                        output.append([[player_item[f.player_name], player_item[f.player_id]], team_abbr, player_item[f.position], opp, randint(10, 32), value[randint(0,1)]])
+                        output.append([player_item[f.player_name], team_abbr, player_item[f.position], opp, randint(10, 32), value[randint(0,1)]])
                 else:
                     continue
                 i += 1
@@ -149,9 +151,7 @@ Returns a list team abbreviations.
 """
 def get_todays_games():
     today = date.today()
-    today_day  = str(today.day) if today.day > 9 else '0' + str(today.day)
-    today_month = str(today.month) if today.month > 9 else '0' + str(today.month)
-    todays_date = str(today.year) + today_month + today_day
+    todays_date = str(today.year) + str(today.month) + str(today.day)
     games = []
 
     todays_games = connection.NBAI.schedules.find({f.game_date : todays_date})
@@ -159,3 +159,20 @@ def get_todays_games():
         team_abbr = connection.NBAI.teams.find_one({f.team_id : int(game[f.team_id])}, {f.team_abbr : 1, '_id' : 0})[f.team_abbr]
         games.append(team_abbr)
     return games
+
+"""
+Given a player_id this will return a dictionary of this players stats for the season.
+Example: get_player_stats_dict(2544) will return a dict of dict of stat value pairs.
+{2017: "player_id" : 2544, "pts" : 9000 ... , 2016 : "player_id" : 2544 , "pts" : 5 }
+"""
+def get_player_season_stats_dict(player_id):
+    player_season_stats_dict = defaultdict(list)
+    query = {"player_id" : player_id}
+    player_record_cursor = connection.PlayerSeasonStatsRecord.find(query)
+    
+    for each in player_record_cursor:
+        single_player_season_stat_record_dict_format = dict(each.items())
+        season = single_player_season_stat_record_dict_format["season"]
+        player_season_stats_dict[season] = single_player_season_stat_record_dict_format
+    
+    return player_season_stats_dict
