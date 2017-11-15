@@ -188,15 +188,15 @@ def get_player_scores(players):
         value = min(value, 1.5)
 
 """
-Save player predictions into database
+Save player predictions into database NBAI
 """
 		
-		rec = connection.PlayerPredictionRecord()
-		rec.player_id = player_id
-		rec.game_id = game_id
-		rec.team_abbr = team_abbr
-		rec.prediction = ftsy_prj
-		rec.save()
+        rec = connection.PlayerPredictionRecord()
+        rec.player_id = player_id
+        rec.game_id = game_id
+        rec.team_abbr = team_abbr
+        rec.prediction = ftsy_prj
+        rec.save()
 
         print('Player: {}'.format(player_name))
         print('    Playing against: {}'.format(team_abbr))
