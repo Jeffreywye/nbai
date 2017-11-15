@@ -9,6 +9,7 @@ from database.connection import DATABASE_NAME, connection
 from database.tables.fields import Fields as f
 from nba_py import team as nba_team
 from nba_py import player as nba_player
+from database.tables.league.player_prediction import PlayerPredictionRecord
 
 
 """
