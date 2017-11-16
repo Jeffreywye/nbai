@@ -146,7 +146,7 @@ def load_todays_players():
                 reverse=True
             )
 
-            roster_ids = [x[0] for x in sorted_players_by_minutes_played[:3]]
+            roster_ids = [x[0] for x in sorted_players_by_minutes_played[:6]]
 
             for player in roster_ids:
                 player_item = extract_player_info(int(player))
@@ -205,7 +205,7 @@ def get_player_scores(players):
         del player[4]
 
     sorted_player_values = sorted(player_values.items(), key=operator.itemgetter(0), reverse=True)
-    player_values = [x[1] for x in sorted_player_values[:6]]
+    player_values = [x[1] for x in sorted_player_values[:3]]
 
 
     return (players, player_values)
