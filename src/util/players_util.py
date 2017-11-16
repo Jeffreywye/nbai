@@ -146,7 +146,7 @@ def load_todays_players():
                 reverse=True
             )
 
-            roster_ids = [x[0] for x in sorted_players_by_minutes_played[:6]]
+            roster_ids = [x[0] for x in sorted_players_by_minutes_played[:3]]
 
             for player in roster_ids:
                 player_item = extract_player_info(int(player))
@@ -187,14 +187,10 @@ def get_player_scores(players):
         ftsy_prj, value = calculate_fantasy_points(player_id, opp_id)
         value = min(value, 1.5)
 
-"""
-Save player predictions into database NBAI
-"""
-		
         rec = connection.PlayerPredictionRecord()
         rec.player_id = player_id
-        rec.game_id = game_id
-        rec.team_abbr = team_abbr
+        rec.game_id    = game_id
+        rec.team_abbr  = team_abbr
         rec.prediction = ftsy_prj
         rec.save()
 
@@ -206,6 +202,7 @@ Save player predictions into database NBAI
         if ftsy_prj > 25 and value > 1.0:
             ten_game_avg = ftsy_prj/value
             player_values[value] = [int(ftsy_prj), int(ten_game_avg), int(ftsy_prj)-int(ten_game_avg), player_id, player_name]
+        del player[4]
 
     sorted_player_values = sorted(player_values.items(), key=operator.itemgetter(0), reverse=True)
     player_values = [x[1] for x in sorted_player_values[:6]]
@@ -236,6 +233,6 @@ def calculate_fantasy_points(player_id, opp_team_id):
     recent_form = 1 if (ftsy_pts_last_10 == 0 or ftsy_pts_last_5 == 0) else (ftsy_pts_last_5/ftsy_pts_last_10)
 
     recent_form = min(max(.85, recent_form), 1.15)
-    ftsy_prj = ftsy_prj * recent_form
+    ftsy_prj = round(ftsy_prj * recent_form, 1)
     value = ftsy_prj/ftsy_pts_last_10 if ftsy_pts_last_10 > 0 else 1
     return (ftsy_prj, value)
