@@ -10,6 +10,7 @@ from database.tables.fields import Fields as f
 from nba_py import team as nba_team
 from nba_py import player as nba_player
 from database.tables.league.player_prediction import PlayerPredictionRecord
+from database.tables.league.player_season_stats import PlayerSeasonStatsRecord
 
 
 """
@@ -238,18 +239,65 @@ def calculate_fantasy_points(player_id, opp_team_id):
     return (ftsy_prj, value)
 
 """
-Given a player_id this will return a dictionary of this players stats for the season.
-Example: get_player_stats_dict(2544) will return a dict of dict of stat value pairs.
-{2017: "player_id" : 2544, "pts" : 9000 ... , 2016 : "player_id" : 2544 , "pts" : 5 }
+Given a player_id this will return a list containig player stats.
+Returns [header, career, season_dict]
+'header' is a list of the stat names in the order they appear in the career and season lists
+'career' is a list of stats for the players complete career (up until 2008)
+'season_dict' is a dict that contains season based player stats
+Ex: season_dict[2017] returns a list of stats for ONLY 2017
 """
-def get_player_season_stats_dict(player_id):
-    player_season_stats_dict = defaultdict(list)
+def get_player_season_stats(player_id):
     query = {"player_id" : player_id}
     player_record_cursor = connection.PlayerSeasonStatsRecord.find(query)
     
+    """ 
+    Will take stat "pts" and return index of that stat in the list to be returned.
+    This is a helper function to order the stats list how it was requested by thefront end team.
+    """ 
+    header = [f.games_played,
+               f.minutes,
+               f.pts,
+               f.fgm,
+               f.fga,
+               "fg%",
+               f.fg3m,
+               f.fg3a,
+               "3p%",
+               f.ftm, 
+               f.fta,
+               "ft%",
+               f.oreb,
+               f.dreb,
+               f.reb,
+               f.ast,
+               f.tov,
+               f.stl,
+               f.blk,
+               f.fouls, 
+               f.plus_minus,
+          ]
+    def lookup_index_of_stat(stat):
+        try:
+            return header.index(stat)
+        except ValueError:
+            return -1;
+
+    career_stats = [0]*21
+    season_dict = {}
     for each in player_record_cursor:
-        single_player_season_stat_record_dict_format = dict(each.items())
-        season = single_player_season_stat_record_dict_format["season"]
-        player_season_stats_dict[season] = single_player_season_stat_record_dict_format
-    
-    return player_season_stats_dict
+
+        season = dict(each.items())[f.season] #gets the current season out of the Cursor object
+        season_list = [None] * 21 #creates list to be big enough for all headers to fit on
+
+        for stat_tuple in each.items(): #for each stat, insert it into the list where we want it
+            ind = lookup_index_of_stat(stat_tuple[0])
+            if ind != -1: #some stats we dont care about. They have an 'index' of -1. We throw them away.
+                # add the stats to both the list for this season and the career stats
+                season_list[ind] = (stat_tuple[1]) 
+                career_stats[ind] += stat_tuple[1]
+        season_list[5] = season_list[3] / season_list[4] * 100
+        season_list[8] = season_list[6] / season_list[7] * 100
+        season_list[11] = season_list[9] / season_list[10] * 100
+        season_dict[season] = season_list
+
+    return [header, career_stats, season_dict]
