@@ -250,11 +250,7 @@ The 'list_of_season_lists' contains contains [[2017, pts, fgm, ...], [2016, pts,
 def get_player_season_stats(player_id):
     query = {f.player_id : player_id}
     player_record_cursor = connection.PlayerSeasonStatsRecord.find(query)
-    
-    """ 
-    Will take stat "pts" and return index of that stat in the list to be returned.
-    This is a helper function to order the stats list how it was requested by thefront end team.
-    """ 
+   
     header = [ f.season,
                f.games_played,
                f.minutes,
@@ -309,7 +305,7 @@ def get_player_season_stats(player_id):
                 value = rec.season
 
             else: 
-                value = getattr(rec, stat)
+                value = round(1.0 * getattr(rec, stat) / games_played, 1)
                 career_stats[len(season_list)] += getattr(rec, stat)
             season_list.append(value)
 
