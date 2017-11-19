@@ -240,22 +240,23 @@ def calculate_fantasy_points(player_id, opp_team_id):
 
 """
 Given a player_id this will return a list containig player stats.
-Returns [header, career, list_list_season]
+Returns [header, career, list_of_season_lists]
 'header' is a list of the stat names in the order they appear in the career and season lists
-'career' is a list of stats for the players complete career (up until 2008)
-'list_list_season' is a list of season lists. The season list contains [2017, pts, fga,...]
-The 'list_list_season' contains contains [[2017, pts, fgm, ...], [2016, pts, fgm, ...], [2015, pts, fgm, ...], ... ]
+'career' is a list of stats for the players complete career 
+'list_of_season_lists' is a list of season lists. The season list contains [2017, pts, fga,...]
+The 'list_of_season_lists' contains contains [[2017, pts, fgm, ...], [2016, pts, fgm, ...], [2015, pts, fgm, ...], ... ]
 
 """
 def get_player_season_stats(player_id):
-    query = {"player_id" : player_id}
+    query = {f.player_id : player_id}
     player_record_cursor = connection.PlayerSeasonStatsRecord.find(query)
     
     """ 
     Will take stat "pts" and return index of that stat in the list to be returned.
     This is a helper function to order the stats list how it was requested by thefront end team.
     """ 
-    header = [f.games_played,
+    header = [ f.season,
+               f.games_played,
                f.minutes,
                f.pts,
                f.fgm,
@@ -277,15 +278,11 @@ def get_player_season_stats(player_id):
                f.fouls, 
                f.plus_minus,
           ]
-    def lookup_index_of_stat(stat):
-        try:
-            return header.index(stat)
-        except ValueError:
-            return -1;
     career_stats = [0]*len(header)
     career_stats[0] = None
-    list_list_season = []  #contains [[2017, pts, fgm, ...], [2016, pts, fgm, ...], [2015, pts, fgm, ...], ... ]
+    list_of_season_lists = []  #contains [[2017, pts, fgm, ...], [2016, pts, fgm, ...], [2015, pts, fgm, ...], ... ]
 
+    player_record_cursor = sorted(player_record_cursor, key=lambda rec : rec.season, reverse=True)
     for rec in player_record_cursor:
         ## we need a new list for each player season
         season_list = []
@@ -303,7 +300,6 @@ def get_player_season_stats(player_id):
 
             elif stat == 'ft%':
                 value = round(100.0 * rec.ftm / rec.fta, 1) if rec.fga else '-'
-                value = 0 
 
             elif stat == f.games_played:
                 value = rec.games_played
@@ -317,7 +313,7 @@ def get_player_season_stats(player_id):
                 career_stats[len(season_list)] += getattr(rec, stat)
             season_list.append(value)
 
-        list_list_season.insert(0, season_list)
+        list_of_season_lists.append(season_list)
 
 
     # average out these percentage stats for the career stats
@@ -325,7 +321,7 @@ def get_player_season_stats(player_id):
         average_percent = 0
         count = 0
         skip = False
-        for season in list_list_season:
+        for season in list_of_season_lists:
             # if they dont have a stat we cant compute the average of it
             if season[percent_stat] == '-':
                 average_percent = 0
@@ -335,7 +331,4 @@ def get_player_season_stats(player_id):
 
         career_stats[percent_stat] = round(average_percent / count, 1) if average_percent != 0 else '-'
 
-
-#     print career_stats
-
-    return [header, career_stats, list_list_season]
+    return [header, career_stats, list_of_season_lists]
