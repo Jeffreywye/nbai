@@ -240,11 +240,12 @@ def calculate_fantasy_points(player_id, opp_team_id):
 
 """
 Given a player_id this will return a list containig player stats.
-Returns [header, career, season_dict]
+Returns [header, career, list_list_season]
 'header' is a list of the stat names in the order they appear in the career and season lists
 'career' is a list of stats for the players complete career (up until 2008)
-'season_dict' is a dict that contains season based player stats
-Ex: season_dict[2017] returns a list of stats for ONLY 2017
+'list_list_season' is a list of season lists. The season list contains [2017, pts, fga,...]
+The 'list_list_season' contains contains [[2017, pts, fgm, ...], [2016, pts, fgm, ...], [2015, pts, fgm, ...], ... ]
+
 """
 def get_player_season_stats(player_id):
     query = {"player_id" : player_id}
@@ -281,23 +282,60 @@ def get_player_season_stats(player_id):
             return header.index(stat)
         except ValueError:
             return -1;
+    career_stats = [0]*len(header)
+    career_stats[0] = None
+    list_list_season = []  #contains [[2017, pts, fgm, ...], [2016, pts, fgm, ...], [2015, pts, fgm, ...], ... ]
 
-    career_stats = [0]*21
-    season_dict = {}
-    for each in player_record_cursor:
+    for rec in player_record_cursor:
+        ## we need a new list for each player season
+        season_list = []
+        for stat in header:
 
-        season = dict(each.items())[f.season] #gets the current season out of the Cursor object
-        season_list = [None] * 21 #creates list to be big enough for all headers to fit on
+            ## get games_played so we only have to retrieve it once for normalization
+            games_played = rec.games_played
 
-        for stat_tuple in each.items(): #for each stat, insert it into the list where we want it
-            ind = lookup_index_of_stat(stat_tuple[0])
-            if ind != -1: #some stats we dont care about. They have an 'index' of -1. We throw them away.
-                # add the stats to both the list for this season and the career stats
-                season_list[ind] = (stat_tuple[1]) 
-                career_stats[ind] += stat_tuple[1]
-        season_list[5] = season_list[3] / season_list[4] * 100
-        season_list[8] = season_list[6] / season_list[7] * 100
-        season_list[11] = season_list[9] / season_list[10] * 100
-        season_dict[season] = season_list
+            ## If this header is one we need to compute, compute it
+            if stat == 'fg%': 
+                value = round(100.0 * rec.fgm / rec.fga , 1) if rec.fga else '-'
 
-    return [header, career_stats, season_dict]
+            elif stat == '3p%':
+                value = round(100.0 * rec.fg3m / rec.fg3a, 1) if rec.fga else '-'
+
+            elif stat == 'ft%':
+                value = round(100.0 * rec.ftm / rec.fta, 1) if rec.fga else '-'
+                value = 0 
+
+            elif stat == f.games_played:
+                value = rec.games_played
+                career_stats[1] += value
+
+            elif stat == f.season: 
+                value = rec.season
+
+            else: 
+                value = getattr(rec, stat)
+                career_stats[len(season_list)] += getattr(rec, stat)
+            season_list.append(value)
+
+        list_list_season.insert(0, season_list)
+
+
+    # average out these percentage stats for the career stats
+    for percent_stat in [6,9,12]:
+        average_percent = 0
+        count = 0
+        skip = False
+        for season in list_list_season:
+            # if they dont have a stat we cant compute the average of it
+            if season[percent_stat] == '-':
+                average_percent = 0
+            else:
+                average_percent += season[percent_stat]
+            count += 1
+
+        career_stats[percent_stat] = round(average_percent / count, 1) if average_percent != 0 else '-'
+
+
+#     print career_stats
+
+    return [header, career_stats, list_list_season]
