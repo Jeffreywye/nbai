@@ -11,6 +11,8 @@ from nba_py import team as nba_team
 from nba_py import player as nba_player
 from database.tables.league.players import PlayerRecord
 from database.tables.league.player_prediction import PlayerPredictionRecord
+from database.tables.league.player_season_stats import PlayerSeasonStatsRecord
+
 
 
 """
@@ -251,3 +253,104 @@ def calculate_fantasy_points(player_id, opp_team_id):
     ftsy_prj = round(ftsy_prj * recent_form, 1)
     value = ftsy_prj/ftsy_pts_last_10 if ftsy_pts_last_10 > 0 else 1
     return (ftsy_prj, value)
+
+
+"""
+Given a player_id, this will return a list containig career/seasonal stats.
+
+Returns [columns, career_stats, season_stats]
+'columns' is a list of the stat names in the order they appear in the career/season lists
+'career_stats' is a list of stats for the players complete career 
+'season_stats' is a list containing lists of season stats.
+
+Both career_stats and the lists inside season_stats are formatted like so:
+[year, games_played, minutes, points, fgm, fga, ... ]
+"""
+def get_player_season_stats(player_id):
+    
+    ## Get the player from the database
+    query = { f.player_id : player_id }
+    player_record_cursor = connection.PlayerSeasonStatsRecord.find(query)
+   
+    columns = [
+        f.season,
+        f.games_played,
+        f.minutes,
+        f.pts,
+        f.fgm,
+        f.fga,
+        "fg%",
+        f.fg3m,
+        f.fg3a,
+        "3p%",
+        f.ftm, 
+        f.fta,
+        "ft%",
+        f.oreb,
+        f.dreb,
+        f.reb,
+        f.ast,
+        f.tov,
+        f.stl,
+        f.blk,
+        f.fouls,
+        f.plus_minus,
+    ]
+
+    ## Create placeholders for the seasonal/career stats
+    season_stats = []
+    career_stats_dict = { col : 0 for col in columns }
+
+    ## Sort the PlayerSeasonStatRecords by year descending
+    player_record_cursor = sorted(player_record_cursor, key=lambda rec : rec.season, reverse=True)
+    
+    ## For each record
+    for rec in player_record_cursor:
+
+        this_season = []
+        
+        ## Iterate through the stat columns
+        for col in columns:
+
+            ## If this column represents a percentage:
+            if col == 'fg%': 
+                value = round(100.0 * rec.fgm / rec.fga , 1) if rec.fga else '-'
+            elif col == '3p%':
+                value = round(100.0 * rec.fg3m / rec.fg3a, 1) if rec.fg3a else '-'
+            elif col == 'ft%':
+                value = round(100.0 * rec.ftm / rec.fta, 1) if rec.fta else '-'
+
+            ## Else, if this header is one that doesn't get normalized:
+            elif col in [ f.games_played, f.season ]:
+                value = getattr(rec, col)
+                career_stats_dict[col] += value
+
+            ## Otherwise, get this stat and normalize it (per game)
+            else:
+                value = round(1.0 * getattr(rec, col) / rec.games_played, 1) if rec.games_played else 0
+                career_stats_dict[col] += getattr(rec, col)
+
+            ## Add this value to this season
+            this_season.append(value)
+
+        ## Add this season to the season_stats
+        season_stats.append(this_season)
+
+    ## Now, build the career stats
+    csd = career_stats_dict
+    career_stats = [round(1.0 * csd[col] / csd[f.games_played], 1) for col in columns]
+
+    ## Fix the stats that shouldn't be normalized
+    season_index = 0
+    games_played_index = 1
+    fg_pct_idx = 6
+    fg3_pct_idx = 9
+    ft_pct_idx = 12
+    career_stats[fg_pct_idx]  = round(100.0 * csd[f.fgm]  / csd[f.fga],  1) if csd[f.fga]  else '-'
+    career_stats[fg3_pct_idx] = round(100.0 * csd[f.fg3m] / csd[f.fg3a], 1) if csd[f.fg3a] else '-'
+    career_stats[ft_pct_idx]  = round(100.0 * csd[f.ftm]  / csd[f.fta],  1) if csd[f.fta]  else '-'
+    career_stats[games_played_index] = csd[f.games_played]
+    career_stats[season_index] = "Career"
+
+    return [columns, career_stats, season_stats]
+
