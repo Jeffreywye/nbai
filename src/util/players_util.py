@@ -118,7 +118,14 @@ Returns a string representing a player's draft position.
 def get_draft_pick(draft_year, draft_pick):
     if draft_pick == 'Undrafted':
         return draft_pick
-    draft_pick = draft_pick + 'st' if draft_pick == '1' else draft_pick + 'th'
+    if draft_pick[-1] == '1' and draft_pick != '11':
+        draft_pick = draft_pick + 'st'
+    elif draft_pick[-1] == '2' and draft_pick != '12':
+        draft_pick = draft_pick + 'nd'
+    elif draft_pick[-1] == '3' and draft_pick != '13':
+        draft_pick = draft_pick + 'rd'
+    else:
+        draft_pick = draft_pick + 'th'
     return '{} : {} overall'.format(draft_year, draft_pick)
 
 
