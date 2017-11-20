@@ -274,8 +274,8 @@ def get_player_season_stats(player_id):
                f.fouls, 
                f.plus_minus,
           ]
-    career_stats = [0]*len(header)
-    career_stats[0] = None
+    career_stats_dict = { stat : 0 for stat in header }
+    
     list_of_season_lists = []  #contains [[2017, pts, fgm, ...], [2016, pts, fgm, ...], [2015, pts, fgm, ...], ... ]
 
     player_record_cursor = sorted(player_record_cursor, key=lambda rec : rec.season, reverse=True)
@@ -299,32 +299,27 @@ def get_player_season_stats(player_id):
 
             elif stat == f.games_played:
                 value = rec.games_played
-                career_stats[1] += value
+                career_stats_dict[stat] += value 
 
             elif stat == f.season: 
                 value = rec.season
 
             else: 
                 value = round(1.0 * getattr(rec, stat) / games_played, 1)
-                career_stats[len(season_list)] += getattr(rec, stat)
+                career_stats_dict[stat] += value
             season_list.append(value)
 
         list_of_season_lists.append(season_list)
 
 
-    # average out these percentage stats for the career stats
-    for percent_stat in [6,9,12]:
-        average_percent = 0
-        count = 0
-        skip = False
-        for season in list_of_season_lists:
-            # if they dont have a stat we cant compute the average of it
-            if season[percent_stat] == '-':
-                average_percent = 0
-            else:
-                average_percent += season[percent_stat]
-            count += 1
+    ## average out these percentage stats for the career stats
+    ## Normalize all the stats
+    career_stats = [ round(1.0 * career_stats_dict[stat] / career_stats_dict[f.games_played], 1) for stat in header ]
 
-        career_stats[percent_stat] = round(average_percent / count, 1) if average_percent != 0 else '-'
+    ## Fix the stats that shouldn't be normalized
+    career_stats[6] = round(100.0 * career_stats_dict[f.ftm] / career_stats_dict[f.fta], 1) if career_stats_dict[f.fta] else '-'
+    career_stats[9] = round(100.0 * career_stats_dict[f.fgm] / career_stats_dict[f.fga], 1) if career_stats_dict[f.fga] else '-'
+    career_stats[12] = round(100.0 * career_stats_dict[f.fg3m] / career_stats_dict[f.fg3a], 1) if career_stats_dict[f.fg3a] else '-'
+    career_stats[1] = career_stats_dict[f.games_played]
 
     return [header, career_stats, list_of_season_lists]
