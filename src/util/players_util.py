@@ -37,6 +37,7 @@ def extract_player_info(playerid):
          f.dob           : 1,
          f.position      : 1,
          f.jersey        : 1,
+         f.first_year    : 1,
          f.last_year     : 1,
          f.team_id       : 1,
          f.pre_nba       : 1,
@@ -52,7 +53,7 @@ def extract_player_info(playerid):
     player[f.position]      = get_player_position(player[f.position])
     player[f.height]        = get_player_height(player[f.height])
     player['age']           = get_player_age(player[f.dob])
-    player['draft']         = get_draft_pick(player[f.draft_year], player[f.draft_overall])
+    player['draft']         = get_draft_pick(player[f.draft_year], player[f.draft_overall], player[f.first_year])
 
     return player
 
@@ -115,9 +116,9 @@ Given a draft year and overall pick, format the pick string.
 
 Returns a string representing a player's draft position.
 """
-def get_draft_pick(draft_year, draft_pick):
+def get_draft_pick(draft_year, draft_pick, first_year):
     if draft_pick == 'Undrafted':
-        return draft_pick
+        return '{} : {}'.format(first_year, draft_pick)
     if draft_pick[-1] == '1' and draft_pick != '11':
         draft_pick = draft_pick + 'st'
     elif draft_pick[-1] == '2' and draft_pick != '12':
