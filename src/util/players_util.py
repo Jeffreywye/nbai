@@ -9,6 +9,7 @@ from database.connection import DATABASE_NAME, connection
 from database.tables.fields import Fields as f
 from nba_py import team as nba_team
 from nba_py import player as nba_player
+from database.tables.league.players import PlayerRecord
 from database.tables.league.player_prediction import PlayerPredictionRecord
 
 
@@ -89,6 +90,7 @@ def get_player_age(dob):
         else:
             return ''
 
+
 """
 Given a team id, retrieves the team abbreviation.
 
@@ -100,6 +102,17 @@ def get_player_team(teamid):
         return team_abbr
     except:
         return ''
+
+
+"""
+Given a year as an int
+
+Return a list of lists of players and their corresponding playerid.
+"""
+def get_list_of_all_players(year):
+    players = connection.PlayerRecord.find({f.last_year : year})
+    return [(player_item.player_id, player_item.player_name) for player_item in players]
+    
 
 """
 Loads 3 players from teams playing on the current day.  The 3 players that are
@@ -157,6 +170,7 @@ def load_todays_players():
                     continue
     return output
 
+
 """
 Loads todays teams playing in games from the database.
 
@@ -172,10 +186,11 @@ def get_todays_games():
         games.append(team_abbr)
     return games
 
+
 """
 Gets projected player fantasy scores and updates the front page player list
 
-Returns an updated list of players, position, score, opponent.
+Returns a tuple of an updated player list and a list of top 3 valued players.
 """
 def get_player_scores(players):
     player_values = {}
@@ -186,7 +201,7 @@ def get_player_scores(players):
 
         ftsy_prj, value = calculate_fantasy_points(player_id, opp_id)
         value = min(value, 1.5)
-
+	
         rec = connection.PlayerPredictionRecord()
         rec.player_id = player_id
         rec.game_id    = game_id
@@ -206,15 +221,15 @@ def get_player_scores(players):
 
     sorted_player_values = sorted(player_values.items(), key=operator.itemgetter(0), reverse=True)
     player_values = [x[1] for x in sorted_player_values[:3]]
-
-
     return (players, player_values)
+
 
 """
 Retrieves and makes some adjustments to our player projections based on recent
-performance of a player.
+performance of a player.  Calculates a player's value based on their projected
+points on a given night against their recent 10-game average.
 
-Returns the projected fantasy points of a player.
+Returns a tuple of the projected fantasy points of a player and their value.
 """
 def calculate_fantasy_points(player_id, opp_team_id):
     ftsy_prj = nba_team.TeamVsPlayer(opp_team_id, player_id, season='2017-18').vs_player_overall()
