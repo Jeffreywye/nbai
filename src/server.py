@@ -5,26 +5,32 @@ import pymongo
 
 from database.connection import DATABASE_NAME, connection
 from datetime import date
-from util.players_util import extract_player_info, load_todays_players, get_todays_games
-
+from util.players_util import *
 
 app = flask.Flask(__name__)
 
-some_list = ['Name', 'Team', 'Position', 'Opponent', 'Our Predictions', 'Value']
+some_list = ['Name', 'Team', 'Position', 'Opponent', 'Our Predictions']
 teamlist = get_todays_games()
 
 name_column_index     = 0;
 position_column_index = 2;
 team_column_index     = 1;
-value_column_index    = 5;
 
 todays_players = load_todays_players()
+todays_players, top_3_value = get_player_scores(todays_players)
+
+all_players = get_list_of_all_players(2017)
+# player page variables
+player_table_headers = ['Opponent Team', 'Fantasy Score', 'Value']
+player_table = [['Team1', 'FantasyScore1', 'Overvalued' ],
+                ['Team2', 'FantasyScore2', 'Undervalued' ],
+                ['Team3', 'FantasyScore3', 'Value3' ]
+                ]
+opp_team_list = ['Team1', 'Team2', 'Team3']
 
 @app.route('/', defaults={'path': ''})
 @app.route('/index.html', defaults={'path': '/index.html'})
 def home_page(path):
-
-
 
     return flask.render_template(
         'index.html',
@@ -33,22 +39,37 @@ def home_page(path):
         position_index = position_column_index,
         team_index     = team_column_index,
         name_index     = name_column_index,
-        value_index    = value_column_index,
-        team_list      = teamlist
+        team_list      = teamlist,
+        top_3_value    = top_3_value
     )
 
 
 @app.route('/players/<playerid>')
 def player_page(playerid):
     player = extract_player_info(playerid)
+    player_season_stats = get_player_season_stats(playerid)
     if(player):
         return flask.render_template(
             'players_page.html',
-            player = player
+            player = player,
+            player_table = player_table,
+            player_table_headers = player_table_headers,
+            opp_team_list = opp_team_list,
+            playerpage_team_index = 0,
+            playerpage_value_index = 2,
+            player_stats_headers = player_season_stats[0],
+            player_career_stats = player_season_stats[1],
+            player_season_stats = player_season_stats[2]
         )
     else:
         return flask.abort(404)
 
+@app.route('/players')
+def players_list():
+    return flask.render_template(
+        'players_list.html',
+        all_players = all_players
+        )
 
 @app.errorhandler(404)
 def page_not_found(e):

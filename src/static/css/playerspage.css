@@ -27,7 +27,7 @@ h3 {
 }
 
 table {
-  border-spacing: 5px 0px;
+  border-spacing: 0px 0px;
   border-collapse: separate;
   margin: 0px;
   padding: 0px;
@@ -35,6 +35,15 @@ table {
 
 tbody {
   padding: 0px;
+}
+
+th {
+  padding: 0px;
+  text-align: center;
+  width: 60px;
+  height: 15px;
+  font-family: 'Muli', Helvetica, Arial, sans-serif;
+  font-size: 16px;
 }
 
 td {
@@ -46,16 +55,33 @@ td {
   font-size: 16px;
 }
 
+tr {
+    background-color: #ebeff2;
+}
+
+#season-stats tr:nth-child(odd) {
+	background-color: #d7dde2;
+}
+
+.overview-category{
+  background-color: #5bbfaa;
+}
+
 .category{
   background-color: #5bbfaa;
 }
 
-.stat{
-  background-color: #71848e;
+.overview-stat{
+    background-color: #ebeff2;
+    color: black;
 }
 
-tr {
+.stat{
+    color: black;
+}
 
+.headers-row{
+    background-color: #5bbfaa;
 }
 
 .player-header {
@@ -72,4 +98,76 @@ tr {
 
 .player-info {
   padding-top: 10px;
+}
+
+.prediction-table-outer-container {
+  background-color: white;
+  padding: 25px;
+}
+
+.prediction-table-outer-container td{
+  color: #757e81;
+}
+
+.player_filter {
+  color: #36404a;
+}
+
+#table {
+  background-color: white;
+}
+
+#table tr:nth-child(1) {
+  background-color: #f4f8fb;
+}
+
+#table-filter {
+  background-color: #f4f8fb;
+  padding: 5px;
+}
+
+#table-filter h2 {
+  font-size: 26px;
+  margin: 0;
+}
+
+#table-filter h3 {
+  font-size: 20px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+#table-filter p {
+  font-size: 14px;
+  color: #36404a;
+  margin: 0;
+  line-height: 14px;
+}
+#table-filter select {
+    margin-bottom: 5px;
+    background-color: #fff;
+    height: 25px;
+}
+
+#top-row {
+  border: none;
+}
+
+#top-row th {
+  font-weight: bolder;
+  font-size: 16px;
+  padding-top: 0;
+  line-height: 20px;
+  color: #36404a;
+  cursor: pointer;
+}
+
+td.overvalued {
+  font-weight: bold;
+  color: #bf5b70;
+}
+
+td.undervalued {
+  font-weight: bold;
+  color: #5bbfaa;
 }

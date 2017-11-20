@@ -33,6 +33,7 @@ class Fields:
     game_id        = 'game_id'
     game_log_saved = 'game_log_saved'
     games_dict     = 'games_dict'
+    games_played   = 'games_played'
     has_bio        = 'has_bio'
     height         = 'height'
     is_home        = 'is_home'
@@ -46,9 +47,11 @@ class Fields:
     plus_minus     = 'plus_minus'
     position       = 'position'
     pre_nba        = 'pre_nba'
+    prediction     = 'prediction'
     pts            = 'pts'
     reb            = 'reb'
     roster         = 'roster'
+    season         = 'season'
     stl            = 'stl'
     team_abbr      = 'team_abbr'
     team_game_id   = 'team_game_id'
@@ -59,7 +62,6 @@ class Fields:
     won            = 'won'
     def __init__(self):
         raise NotImplementedError("Don't instantiate me!")
-
 
 
 """
@@ -98,6 +100,7 @@ class Structure:
     game_id        = basestring
     game_log_saved = bool
     games_dict     = { basestring : [basestring] }
+    games_played   = int
     has_bio        = bool
     height         = int
     is_home        = bool
@@ -111,9 +114,11 @@ class Structure:
     plus_minus     = int
     position       = basestring
     pre_nba        = basestring
+    prediction     = float
     pts            = int
     reb            = int
     roster         = [int]
+    season         = int
     stl            = int
     team_abbr      = basestring
     team_game_id   = basestring
@@ -124,4 +129,3 @@ class Structure:
     won            = bool
     def __init__(self):
         raise NotImplementedError("Don't instantiate me!")
-
