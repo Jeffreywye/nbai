@@ -1,5 +1,6 @@
 # NBAI - A prediction system for basketball statistics.
 
+
 Step 1:
 	Open up your internet browser.
 
@@ -104,5 +105,6 @@ The NBAI site is now running locally!
         * `sudo apt-get install mongodb-org-server` 
     * Start the Mongo service
         * `sudo service mongod start`
+        
 
 Once you have this, you're ready to start hosting web traffic.

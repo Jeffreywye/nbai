@@ -7,7 +7,6 @@ from database.connection import DATABASE_NAME, connection
 from datetime import date
 from util.players_util import *
 
-
 app = flask.Flask(__name__)
 
 some_list = ['Name', 'Team', 'Position', 'Opponent', 'Our Predictions']
@@ -29,10 +28,10 @@ player_table = [['Team1', 'FantasyScore1', 'Overvalued' ],
                 ]
 opp_team_list = ['Team1', 'Team2', 'Team3']
 
-
 @app.route('/', defaults={'path': ''})
 @app.route('/index.html', defaults={'path': '/index.html'})
 def home_page(path):
+
     return flask.render_template(
         'index.html',
         header_list    = some_list,

@@ -14,7 +14,6 @@ from database.tables.league.player_prediction import PlayerPredictionRecord
 from database.tables.league.player_season_stats import PlayerSeasonStatsRecord
 
 
-
 """
 Attemps to create a player dict containing information to be rendered.
 

@@ -399,7 +399,6 @@ def create_and_save_2017_schedule_records(skip_preseason=True,
     logging.info('Updated {} ScheduleRecords.'.format(num_saved_records))
 
 
-
 """
 Creates a PlayerSeasonStatsRecord from a list of PlayerGameNodes.
 Assumes that the nodes in pg_nodes all have the same player_id.
@@ -490,4 +489,3 @@ def create_and_save_all_player_season_stats_records(player_game_nodes, season):
     logging.info("INSERTED this many {} PlayerSeasonStatRecords: {}".format(season, insert_count))
     logging.info("UPDATED  this many {} PlayerSeasonStatRecords: {}".format(season, update_count))
     return
-

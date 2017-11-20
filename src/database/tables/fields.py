@@ -64,7 +64,6 @@ class Fields:
         raise NotImplementedError("Don't instantiate me!")
 
 
-
 """
 Structure contains all of the types for the various fields of the database.
 

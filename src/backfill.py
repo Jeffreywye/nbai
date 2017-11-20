@@ -66,7 +66,6 @@ def backfill_server(start_year, end_year, add_missing_player_bios, update_all_pl
     database_util.create_and_save_2017_schedule_records()
 
 
-
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--start_year', type=int, default=CURRENT_SEASON_YEAR)
