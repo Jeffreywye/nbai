@@ -12,17 +12,17 @@ now = datetime.datetime.utcnow()
 CURRENT_SEASON_YEAR = now.year if now.month > 8 else now.year - 1
 
 
-"""
-Populates the database with player info and game info.
-Given a range of [start_season, end_season], this populates
-the Schedules, Players, Teams, PlayerGameLog, and TeamGameLog
-collections with the appropriate data.
-
-Does not add duplicates, so if this is run multiple times in succession
-no data duplication errors will arise.
-"""
 @log_call_stack
 def backfill_server(start_year, end_year, add_missing_player_bios, update_all_player_bios):
+    """
+    Populates the database with player info and game info.
+    Given a range of [start_season, end_season], this populates
+    the Schedules, Players, Teams, PlayerGameLog, and TeamGameLog
+    collections with the appropriate data.
+
+    Does not add duplicates, so if this is run multiple times in succession
+    no data duplication errors will arise.
+    """
 
     ## Create all the teams (without active rosters)
     database_util.create_and_save_all_team_records()
