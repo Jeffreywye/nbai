@@ -14,19 +14,19 @@ from database.tables.league.player_prediction import PlayerPredictionRecord
 from database.tables.league.player_season_stats import PlayerSeasonStatsRecord
 
 
-"""
-Attemps to create a player dict containing information to be rendered.
-
-Connects to the database and searches for a player based on a playerid passed
-in from the path.  If the player cannot be located in the database or is no
-longer active, we will return none and the server will return a 404 status code.
-
-If the player is found and is active, call functions to format position and
-height and to calculate age from the player dob.
-
-Returns the player dict.
-"""
 def extract_player_info(playerid):
+    """
+    Attemps to create a player dict containing information to be rendered.
+
+    Connects to the database and searches for a player based on a playerid passed
+    in from the path.  If the player cannot be located in the database or is no
+    longer active, we will return none and the server will return a 404 status code.
+
+    If the player is found and is active, call functions to format position and
+    height and to calculate age from the player dob.
+
+    Returns the player dict.
+    """
     try:
         player = connection.NBAI.players.find_one({f.player_id : int(playerid)},
          {f.player_id    : 1,
@@ -57,52 +57,52 @@ def extract_player_info(playerid):
     return player
 
 
-"""
-Given a player position from the database, formats the position for display.
-
-If the player has a position in the database, we must first convert the string
-from unicode to ascii to call translate, and we then remove all lowercase
-letters so that Forward => F, Guard-Forward => G-F, etc...
-
-Returns the position if there is one, otherwise returns an empty string.
-"""
 def get_player_position(position):
+    """
+    Given a player position from the database, formats the position for display.
+
+    If the player has a position in the database, we must first convert the string
+    from unicode to ascii to call translate, and we then remove all lowercase
+    letters so that Forward => F, Guard-Forward => G-F, etc...
+
+    Returns the position if there is one, otherwise returns an empty string.
+    """
     if position:
         unicode_to_string  = unicodedata.normalize('NFKD', position).encode('ascii','ignore')
         return unicode_to_string.translate(None,string.ascii_lowercase)
     return ''
 
 
-"""
-Given a player height from the database in inches, formats it for display.
-
-Returns height in feet and inches if the player has a height in the database,
-returns an empty string otherwise.
-"""
 def get_player_height(height):
-        return str(int(math.floor(int(height)/12))) + "'" + str(int(height)%12) + '"' if height else ''
+    """
+    Given a player height from the database in inches, formats it for display.
+
+    Returns height in feet and inches if the player has a height in the database,
+    returns an empty string otherwise.
+    """
+    return str(int(math.floor(int(height)/12))) + "'" + str(int(height)%12) + '"' if height else ''
 
 
-"""
-Given a player date of birth from the database, calculates the player's age.
-
-Returns the player's age if a dob exists, returns an empty string otherwise.
-"""
 def get_player_age(dob):
-        if(dob):
-            dob_year, dob_month, dob_day = [int(x) for x in dob.split('-')]
-            today = date.today()
-            return today.year - dob_year - ((today.month, today.day) < (dob_month, dob_day))
-        else:
-            return ''
+    """
+    Given a player date of birth from the database, calculates the player's age.
+
+    Returns the player's age if a dob exists, returns an empty string otherwise.
+    """
+    if(dob):
+        dob_year, dob_month, dob_day = [int(x) for x in dob.split('-')]
+        today = date.today()
+        return today.year - dob_year - ((today.month, today.day) < (dob_month, dob_day))
+    else:
+        return ''
 
 
-"""
-Given a team id, retrieves the team abbreviation.
-
-Returns a string - team abbreviation if found, empty string otherwise.
-"""
 def get_player_team(teamid):
+    """
+    Given a team id, retrieves the team abbreviation.
+
+    Returns a string - team abbreviation if found, empty string otherwise.
+    """
     try:
         team_abbr = connection.NBAI.teams.find_one({f.team_id : int(teamid)}, {f.team_abbr : 1, '_id' : 0})[f.team_abbr]
         return team_abbr
@@ -110,12 +110,12 @@ def get_player_team(teamid):
         return ''
 
 
-"""
-Given a draft year and overall pick, format the pick string.
-
-Returns a string representing a player's draft position.
-"""
 def get_draft_pick(draft_year, draft_pick, first_year):
+    """
+    Given a draft year and overall pick, format the pick string.
+
+    Returns a string representing a player's draft position.
+    """
     if draft_pick == 'Undrafted':
         return '{} : {}'.format(first_year, draft_pick)
     if draft_pick[-1] == '1' and draft_pick != '11':
@@ -129,24 +129,24 @@ def get_draft_pick(draft_year, draft_pick, first_year):
     return '{} : {} overall'.format(draft_year, draft_pick)
 
 
-"""
-Given a year as an int
-
-Return a list of lists of players and their corresponding playerid.
-"""
 def get_list_of_all_players(year):
+    """
+    Given a year as an int
+
+    Return a list of lists of players and their corresponding playerid.
+    """
     players = connection.PlayerRecord.find({f.last_year : year})
     return [(player_item.player_id, player_item.player_name) for player_item in players]
 
 
-"""
-Loads 3 players from teams playing on the current day.  The 3 players that are
-loaded are the 3 players who played the most minutes for a given team in their
-previous game.
-
-Returns a list of players, position, value, opponent.
-"""
 def load_todays_players():
+    """
+    Loads 3 players from teams playing on the current day.  The 3 players that are
+    loaded are the 3 players who played the most minutes for a given team in their
+    previous game.
+
+    Returns a list of players, position, value, opponent.
+    """
     todays_date = datetime.strftime(datetime.now(), '%Y%m%d')
     games = {}
     output = []
@@ -195,12 +195,12 @@ def load_todays_players():
     return output
 
 
-"""
-Loads todays teams playing in games from the database.
-
-Returns a list team abbreviations.
-"""
 def get_todays_games():
+    """
+    Loads todays teams playing in games from the database.
+
+    Returns a list team abbreviations.
+    """
     todays_date = datetime.strftime(datetime.now(), '%Y%m%d')
     games = []
 
@@ -211,12 +211,12 @@ def get_todays_games():
     return games
 
 
-"""
-Gets projected player fantasy scores and updates the front page player list
-
-Returns a tuple of an updated player list and a list of top 3 valued players.
-"""
 def get_player_scores(players):
+    """
+    Gets projected player fantasy scores and updates the front page player list
+
+    Returns a tuple of an updated player list and a list of top 3 valued players.
+    """
     player_values = {}
     for player in players:
         player_name, player_id, team_abbr, opp, game_id = player[0][0], player[0][1], player[1], player[3], player[4]
@@ -248,14 +248,14 @@ def get_player_scores(players):
     return (players, player_values)
 
 
-"""
-Retrieves and makes some adjustments to our player projections based on recent
-performance of a player.  Calculates a player's value based on their projected
-points on a given night against their recent 10-game average.
-
-Returns a tuple of the projected fantasy points of a player and their value.
-"""
 def calculate_fantasy_points(player_id, opp_team_id):
+    """
+    Retrieves and makes some adjustments to our player projections based on recent
+    performance of a player.  Calculates a player's value based on their projected
+    points on a given night against their recent 10-game average.
+
+    Returns a tuple of the projected fantasy points of a player and their value.
+    """
     ftsy_prj = nba_team.TeamVsPlayer(opp_team_id, player_id, season='2017-18').vs_player_overall()
     ftsy_prj = ftsy_prj[0]['NBA_FANTASY_PTS'] if len(ftsy_prj) else 0
 
@@ -277,18 +277,18 @@ def calculate_fantasy_points(player_id, opp_team_id):
     return (ftsy_prj, value)
 
 
-"""
-Given a player_id, this will return a list containig career/seasonal stats.
-
-Returns [columns, career_stats, season_stats]
-'columns' is a list of the stat names in the order they appear in the career/season lists
-'career_stats' is a list of stats for the players complete career
-'season_stats' is a list containing lists of season stats.
-
-Both career_stats and the lists inside season_stats are formatted like so:
-[year, games_played, minutes, points, fgm, fga, ... ]
-"""
 def get_player_season_stats(player_id):
+    """
+    Given a player_id, this will return a list containig career/seasonal stats.
+
+    Returns [columns, career_stats, season_stats]
+    'columns' is a list of the stat names in the order they appear in the career/season lists
+    'career_stats' is a list of stats for the players complete career
+    'season_stats' is a list containing lists of season stats.
+
+    Both career_stats and the lists inside season_stats are formatted like so:
+    [year, games_played, minutes, points, fgm, fga, ... ]
+    """
 
     ## Get the player from the database
     query = { f.player_id : int(player_id) }

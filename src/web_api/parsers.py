@@ -99,11 +99,11 @@ def get_exp(nba_data, nba_key):
 
 
 
-"""
-Decorator for logging the call stack.
-Prints the name of the function, as well as the params
-"""
 def log_call_stack(func):
+    """
+    Decorator for logging the call stack.
+    Prints the name of the function, as well as the params
+    """
     def anon(*args, **kwargs):
         quoted = lambda v : '"{}"'.format(v) if isinstance(v, basestring) else v
         fargs = ', '.join([str(arg) for arg in args])
