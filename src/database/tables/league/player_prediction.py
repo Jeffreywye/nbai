@@ -23,7 +23,7 @@ class PlayerPredictionRecord(DatabaseRecord):
     indexes = [
         {
             'fields' : [f.player_id],
-            'unique' : True
+            'unique' : False
         }
     ]
 
@@ -37,4 +37,6 @@ class PlayerPredictionRecord(DatabaseRecord):
     default_values = {
         
     }
+
+
 
