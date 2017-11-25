@@ -3,7 +3,6 @@ import datetime
 import os
 import time
 
-server_updated_today = False
 date_updated = datetime.date.today()
 
 def do_server_update():
