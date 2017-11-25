@@ -1,11 +1,11 @@
-"""
-Fields contains all of the fields used in the database object.
-
-By centralizing this into one class, we can ensure that no typos
-occur throughout our code (because runtime errors will occur if
-we try to access a nonexistient field, such as 'plyaer_id')
-"""
 class Fields:
+    """
+    Fields contains all of the fields used in the database object.
+
+    By centralizing this into one class, we can ensure that no typos
+    occur throughout our code (because runtime errors will occur if
+    we try to access a nonexistient field, such as 'plyaer_id')
+    """
     ast            = 'ast'
     blk            = 'blk'
     color          = 'color'
@@ -47,6 +47,7 @@ class Fields:
     plus_minus     = 'plus_minus'
     position       = 'position'
     pre_nba        = 'pre_nba'
+    prediction     = 'prediction'
     pts            = 'pts'
     reb            = 'reb'
     roster         = 'roster'
@@ -63,16 +64,15 @@ class Fields:
         raise NotImplementedError("Don't instantiate me!")
 
 
-
-"""
-Structure contains all of the types for the various fields of the database.
-
-By centralizing this into one place, we can ensure any DatabaseRecord that uses
-a particular field has the same data type.  This prevents mismatching key errors,
-like if a PlayerRecord represents player_id with an int but PlayerGameLogRecord
-uses a basestring.
-"""
 class Structure:
+    """
+    Structure contains all of the types for the various fields of the database.
+
+    By centralizing this into one place, we can ensure any DatabaseRecord that uses
+    a particular field has the same data type.  This prevents mismatching key errors,
+    like if a PlayerRecord represents player_id with an int but PlayerGameLogRecord
+    uses a basestring.
+    """
     ast            = int
     blk            = int
     color          = basestring
@@ -114,6 +114,7 @@ class Structure:
     plus_minus     = int
     position       = basestring
     pre_nba        = basestring
+    prediction     = float
     pts            = int
     reb            = int
     roster         = [int]
@@ -128,4 +129,3 @@ class Structure:
     won            = bool
     def __init__(self):
         raise NotImplementedError("Don't instantiate me!")
-

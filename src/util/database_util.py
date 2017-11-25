@@ -16,11 +16,11 @@ from database.tables.league.player_season_stats import PlayerSeasonStatsRecord
 
 
 
-"""
-Adds each team to our database (if not present).
-Does not set/update rosters
-"""
 def create_and_save_all_team_records():
+    """
+    Adds each team to our database (if not present).
+    Does not set/update rosters
+    """
 
     for team_dict in nba_py.constants.TEAMS.values():
 
@@ -44,12 +44,12 @@ def create_and_save_all_team_records():
 
 
 
-"""
-Adds one team to the database.
-Does not set roster, games, or query stats.nba.com
-"""
 @log_call_stack
 def create_and_save_one_team(team_dict):
+    """
+    Adds one team to the database.
+    Does not set roster, games, or query stats.nba.com
+    """
     team_rec = connection.TeamRecord()
     team_rec.team_id    = int(team_dict['id'])
     team_rec.team_name  = '{} {}'.format(team_dict['city'], team_dict['name'])
@@ -66,17 +66,17 @@ def create_and_save_one_team(team_dict):
 
 
 
-"""
-Creates and saves all PlayerRecords for a given season.
-
-If given a dict (optional), this will first search the dict
-for a given player (to reduce queries to the database when
-populating multiple seasons).
-
-Does not update biographical info.
-Does not update player_name (this is intentional).
-"""
 def create_and_save_all_player_records(player_game_logs, year, player_dict=None):
+    """
+    Creates and saves all PlayerRecords for a given season.
+
+    If given a dict (optional), this will first search the dict
+    for a given player (to reduce queries to the database when
+    populating multiple seasons).
+
+    Does not update biographical info.
+    Does not update player_name (this is intentional).
+    """
 
     ## Create an empty dictionary if none exists
     if player_dict is None:
@@ -128,26 +128,26 @@ def create_and_save_all_player_records(player_game_logs, year, player_dict=None)
 
 
 
-"""
-Creates and saves all nonexistent PlayerGameLogRecords, if not present in the database
-"""
 def create_and_save_all_player_game_log_records(player_game_logs):
+    """
+    Creates and saves all nonexistent PlayerGameLogRecords, if not present in the database
+    """
     _create_and_save_game_logs(player_game_logs, f.player_game_id, PlayerGameLogRecord.__collection__)
 
 
 
-"""
-Creates and saves all nonexistent TeamGameLogRecords, if not present in the database
-"""
 def create_and_save_all_team_game_log_records(team_game_logs, team_game_rosters):
+    """
+    Creates and saves all nonexistent TeamGameLogRecords, if not present in the database
+    """
     _create_and_save_game_logs(team_game_logs, f.team_game_id, TeamGameLogRecord.__collection__, team_game_rosters)
 
 
 
-"""
-Genericized form of create_and_save_all_XXX_game_log_records()
-"""
 def _create_and_save_game_logs(game_logs, primary_key, table_name, team_game_rosters=None):
+    """
+    Genericized form of create_and_save_all_XXX_game_log_records()
+    """
 
     ## Check if any of the records we're trying to save
     ## are already in the database (via a batch query)
@@ -181,10 +181,10 @@ def _create_and_save_game_logs(game_logs, primary_key, table_name, team_game_ros
 
 
 
-"""
-Creates a GameRecord from a GameLog.  Sets the roster if applicable.
-"""
 def _get_game_log_record(game_log, primary_key, team_game_rosters=None):
+    """
+    Creates a GameRecord from a GameLog.  Sets the roster if applicable.
+    """
 
     if primary_key == f.player_game_id:
         rec = connection.PlayerGameLogRecord()
@@ -206,12 +206,12 @@ def _get_game_log_record(game_log, primary_key, team_game_rosters=None):
 
 
 
-"""
-Returns a dict of <team_game_id : [player_id]> pairs.
-These rosters are the rosters for a specific team_game_id,
-not the current active rosters.
-"""
 def get_team_game_rosters(player_game_logs):
+    """
+    Returns a dict of <team_game_id : [player_id]> pairs.
+    These rosters are the rosters for a specific team_game_id,
+    not the current active rosters.
+    """
     team_game_rosters = {}
     for game_log in player_game_logs:
         team_game_rosters.setdefault(game_log.team_game_id, []).append(game_log.player_id)
@@ -219,12 +219,12 @@ def get_team_game_rosters(player_game_logs):
 
 
 
-"""
-Updates the current roster of every team.
-Also updates the player's team data, if they were dropped or added.
-"""
 @log_call_stack
 def update_rosters(year):
+    """
+    Updates the current roster of every team.
+    Also updates the player's team data, if they were dropped or added.
+    """
 
     ## Get all rosters
     rosters = get_all_rosters(year)
@@ -270,14 +270,14 @@ def update_rosters(year):
 
 
 
-"""
-Updates some player biographical info.
-
-This is fast.  Sends one HTTP request and gets every player's
-name, player_id, and other fields.
-"""
 @log_call_stack
 def update_short_player_bios():
+    """
+    Updates some player biographical info.
+
+    This is fast.  Sends one HTTP request and gets every player's
+    name, player_id, and other fields.
+    """
 
     ## First, get all the player info from the web api
     bio_dict = { node.player_id : node for node in get_all_short_player_bios() }
@@ -298,16 +298,16 @@ def update_short_player_bios():
 
 
 
-"""
-Updates all player biographical info.
-
-This is SLOW.  Each player requires a unique HTTP request
-to retrieve their data.  This only needs to be run once
-every so often, such as at the end of a season or during
-initial database setup.
-"""
 @log_call_stack
 def update_long_player_bios(update_all_player_bios):
+    """
+    Updates all player biographical info.
+
+    This is SLOW.  Each player requires a unique HTTP request
+    to retrieve their data.  This only needs to be run once
+    every so often, such as at the end of a season or during
+    initial database setup.
+    """
 
     counter_for_logging = 0
     for player_rec in connection.PlayerRecord.find():
@@ -332,10 +332,10 @@ def update_long_player_bios(update_all_player_bios):
 
 
 
-"""
-Creates and saves all nonexistent ScheduleRecords, if not present in the database
-"""
 def create_and_save_all_schedule_records(team_game_nodes):
+    """
+    Creates and saves all nonexistent ScheduleRecords, if not present in the database
+    """
 
     ## Create a dict of (team_game_id, game_date) pairs
     scheds = { node.team_game_id : node for node in team_game_nodes }
@@ -399,12 +399,11 @@ def create_and_save_2017_schedule_records(skip_preseason=True,
     logging.info('Updated {} ScheduleRecords.'.format(num_saved_records))
 
 
-
-"""
-Creates a PlayerSeasonStatsRecord from a list of PlayerGameNodes.
-Assumes that the nodes in pg_nodes all have the same player_id.
-"""
 def _get_player_season_stats_record(player_id, pg_nodes, season):
+    """
+    Creates a PlayerSeasonStatsRecord from a list of PlayerGameNodes.
+    Assumes that the nodes in pg_nodes all have the same player_id.
+    """
 
     ## Create a PlayerSeasonStatsRecord object
     rec = connection.PlayerSeasonStatsRecord()
@@ -437,10 +436,10 @@ def _get_player_season_stats_record(player_id, pg_nodes, season):
 
 
 
-"""
-Creates and saves all nonexistent PlayerSeasonStatsRecords, if not present in the database
-"""
 def create_and_save_all_player_season_stats_records(player_game_nodes, season):
+    """
+    Creates and saves all nonexistent PlayerSeasonStatsRecords, if not present in the database
+    """
 
     ## Create a dict of {player_id : [player_game_node]} pairs
     player_dict = {}
@@ -462,26 +461,31 @@ def create_and_save_all_player_season_stats_records(player_game_nodes, season):
     previously_saved_records = { rec[f.player_id] : rec for rec in
                                  player_season_stats_table.find(query) }
 
-    ## Get a list of the records to save
-    insert_batch = [rec for rec in records_we_might_save
-             if rec.player_id not in previously_saved_records]
-    update_batch = [rec for rec in records_we_might_save
-             if rec.player_id in previously_saved_records
-             and rec.games_played > previously_saved_records[rec.player_id][f.games_played]]
-    for rec in update_batch:
-        rec._id = previously_saved_records['_id']
+    ## Get the records to save
+    insert_count = 0
+    update_count = 0
+    bulk_operation = player_season_stats_table.initialize_ordered_bulk_op()
+    for rec in records_we_might_save:
 
-    ## Save these records
-    count = 0
-    if insert_batch:
-        saved_records = player_season_stats_table.insert(insert_batch)
-        count = len(saved_records)
-    logging.info("INSERTED this many {} PlayerSeasonStatRecords: {}".format(season, count))
+        ## If this player is not in the database
+        if rec.player_id not in previously_saved_records:
+            bulk_operation.insert(rec)
+            insert_count += 1
 
-    count = 0
-    if update_batch:
-        saved_records = player_season_stats_table.update(update_batch)
-        count = len(saved_records)
-    logging.info("UPDATED  this many {} PlayerSeasonStatRecords: {}".format(season, count))
+        ## Otherwise, if this player already exists for this year,
+        ## but this record is newer, update it
+        elif rec.player_id in previously_saved_records \
+        and rec.games_played > previously_saved_records[rec.player_id][f.games_played]:
+            old_id = previously_saved_records[rec.player_id]['_id']
+            bulk_operation.find({'_id' : old_id}).update({'$set' : rec})
+            update_count += 1
 
+    ## Save all of these records
+    if insert_count > 0 or update_count > 0:
+        saved_records = bulk_operation.execute()
+        insert_count = saved_records['nInserted']
+        update_count = saved_records['nModified']
+
+    logging.info("INSERTED this many {} PlayerSeasonStatRecords: {}".format(season, insert_count))
+    logging.info("UPDATED  this many {} PlayerSeasonStatRecords: {}".format(season, update_count))
     return

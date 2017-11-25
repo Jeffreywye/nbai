@@ -16,65 +16,58 @@ from web_api.nodes.schedulenodes import ScheduleNode
 nba_py.HAS_PANDAS = False
 
 
-
-"""
-Returns a list of ShortPlayerBioNodes
-"""
 def get_all_short_player_bios():
+    """
+    Returns a list of ShortPlayerBioNodes
+    """
     return [ShortPlayerBioNode(datum) for datum in nba_py_player.PlayerList(only_current=0).info()]
 
 
-
-"""
-Returns a single FullPlayerBioNode
-"""
 def get_long_player_bio(player_id):
+    """
+    Returns a single FullPlayerBioNode
+    """
     return LongPlayerBioNode(nba_py_player.PlayerSummary(player_id).info()[0])
 
 
-
-"""
-Returns a dict of <team_id, RosterNode> pairs for every team as of today
-"""
 def get_all_rosters(year):
+    """
+    Returns a dict of <team_id, RosterNode> pairs for every team as of today
+    """
     season = '{}-{}'.format(year, str(year+1)[2:])
     team_ids = [int(team['id']) for team in TEAMS.values()]
     nba_data = lambda team_id : nba_py_team.TeamCommonRoster(team_id, season=season).roster()
     return { tid : RosterNode(nba_data(tid), tid) for tid in team_ids }
 
 
-
-"""
-Returns a list of PlayerGameNodes for a given season
-"""
 def get_player_game_nodes(year):
+    """
+    Returns a list of PlayerGameNodes for a given season
+    """
     nodes = [PlayerGameNode(datum) for datum in get_gamelog_json(year, 'P')]
     return [node for node in nodes if node.won is not None]
 
 
-
-"""
-Returns a list of TeamGameNodes for a given season
-"""
 def get_team_game_nodes(year):
+    """
+    Returns a list of TeamGameNodes for a given season
+    """
     nodes = [TeamGameNode(datum) for datum in get_gamelog_json(year, 'T')]
     return [node for node in nodes if node.won is not None]
 
 
-
-"""
-Returns a JSON node containing player or team game logs from stats.nba.com
-"""
 def get_gamelog_json(year, player_or_team):
+    """
+    Returns a JSON node containing player or team game logs from stats.nba.com
+    """
     season = '{}-{}'.format(year, str(year+1)[2:])
     return nba_py_league.GameLog(season=season, player_or_team=player_or_team).overall()
 
 
-
-"""
-Returns a list of 2017 schedule nodes
-"""
 def get_2017_schedule_nodes(skip_preseason, skip_regular_season, skip_postseason):
+    """
+    Returns a list of 2017 schedule nodes
+    """
 
     is_preseason      = lambda game_node : game_node['gid'].startswith('001')
     is_regular_season = lambda game_node : game_node['gid'].startswith('002')
@@ -100,4 +93,3 @@ def get_2017_schedule_nodes(skip_preseason, skip_regular_season, skip_postseason
                 node.is_home      = is_team_at_home
                 nodes.append(node)
     return nodes
-

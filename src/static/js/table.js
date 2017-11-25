@@ -101,9 +101,6 @@ function newFilterFunction(name_index, team_index, position_index){
   		}
 		var pos_all = (position_filter == "ALL");
 
-
-
-
   		if ((name_bool||name_all)&&(team_bool||team_all)&&(pos_bool||pos_all)) {
   			rows[i].style.display = "";
         // setColors(display_color, rows[i]);
@@ -116,14 +113,3 @@ function newFilterFunction(name_index, team_index, position_index){
 
   	}
 }
-
-// function setColors(display_color, row) {
-//   if(display_color == 0) {
-//     row.style.backgroundColor = "white";
-//     display_color = 1;
-//   }
-//   else{
-//     row.style.backgroundColor = "#f4f8fb";
-//     display_color = 0;
-//   }
-// }
