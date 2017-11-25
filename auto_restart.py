@@ -12,7 +12,7 @@ def do_server_update():
 def do_git_pull():
     os.chdir("/var/www/nbai_live")
     result = os.popen("git pull").read()
-    
+
     if result != 'Already up-to-date.\n':
         do_server_update()
         
@@ -24,7 +24,5 @@ while(True):
     if time_now.hour == 2 and server_updated_today == True:
         server_updated_today == False
 
-    if time_now.second % 20 == 0:
-        do_git_pull()
-
-    time.sleep(.500)
+    do_git_pull()
+    time.sleep(20)
