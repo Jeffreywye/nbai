@@ -23,7 +23,7 @@ class PlayerPredictionRecord(DatabaseRecord):
     indexes = [
         {
             'fields' : [f.player_id],
-            'unique' : True
+            'unique' : False
         }
     ]
 
