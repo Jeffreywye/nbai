@@ -4,6 +4,7 @@ import os
 import time
 
 server_updated_today = False
+date_updated = datetime.date.today()
 
 def do_server_update():
     os.popen("killall server.py").read()
@@ -16,13 +17,10 @@ def do_git_pull():
     if result != 'Already up-to-date.\n':
         do_server_update()
         
-while(True):
-    time_now = datetime.datetime.now()
-    if time_now.hour == 1 and server_updated_today == False:
+while True:
+    if datetime.date.today() > date_updated and datetime.datetime.now().hour == 3:
         do_server_update()
-        server_updated_today = True
-    if time_now.hour == 2 and server_updated_today == True:
-        server_updated_today == False
+        date_updated = datetime.date.today()
 
     do_git_pull()
     time.sleep(20)
