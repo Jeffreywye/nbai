@@ -22,4 +22,5 @@ while True:
         date_updated = datetime.date.today()
 
     do_git_pull()
-    time.sleep(1)
+    time.sleep(20)
+
